@@ -1,0 +1,5 @@
+name: Collectors
+author: ufo
+version: ${project.version}
+main: me.ufo.collectors.CollectorsPlugin
+description: ${project.description}
