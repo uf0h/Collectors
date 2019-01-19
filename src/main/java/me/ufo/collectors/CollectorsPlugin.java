@@ -5,7 +5,12 @@ import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
+import me.ufo.collectors.adapters.LocationTypeAdapter;
+import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
+import me.ufo.collectors.listeners.PlayerListener;
+import me.ufo.collectors.tasks.CollectorSaveThread;
+import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,19 +27,28 @@ public class CollectorsPlugin extends JavaPlugin {
 
         instance = this;
 
-        this.gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(Location.class, new LocationTypeAdapter())
+                    .disableHtmlEscaping().setPrettyPrinting().create();
+
+        if (!Collector.initialize()) {
+            this.getLogger().warning("Collectors have failed to be loaded into memory.");
+            this.getServer().getPluginManager().disablePlugin(this);
+        }
 
         this.registerCommands(new PaperCommandManager(this),
                 new CollectorsCommand());
 
-        this.registerListeners();
+        this.registerListeners(new PlayerListener());
 
         this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
+
+        this.getServer().getScheduler().runTaskLater(this, () -> new CollectorSaveThread().start(), 100L);
     }
 
     @Override
     public void onDisable() {
-        instance = null;
+        Collector.saveall();
     }
 
     private void registerCommands(PaperCommandManager paperCommandManager, BaseCommand... baseCommands) {
