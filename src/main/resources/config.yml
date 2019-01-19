@@ -6,17 +6,59 @@ collection-types:
     material: CACTUS
     durability: 0
     gui-slot: 12
-  CREEPER:
-    name: "&eCreeper"
+  SUGAR_CANE:
+    name: "&eSugarcane"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
     material: MONSTER_EGG
     durability: 50
     gui-slot: 13
+  TNT:
+    name: "&eTNT"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 50
+    gui-slot: 14
   PIG:
     name: "&ePig"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
     material: DIAMOND_SWORD
     durability: 0
-    gui-slot: 14
+    gui-slot: 21
+  COW:
+    name: "&eCow"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: DIAMOND_SWORD
+    durability: 0
+    gui-slot: 22
+  PIG_ZOMBIE:
+    name: "&eZombie Pigmen"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: DIAMOND_SWORD
+    durability: 0
+    gui-slot: 23
+  ENDERMAN:
+    name: "&eEndermen"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: DIAMOND_SWORD
+    durability: 0
+    gui-slot: 30
+  IRON_GOLEM:
+    name: "&eIron Golem"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: DIAMOND_SWORD
+    durability: 0
+    gui-slot: 31
+  VILLAGER:
+    name: "&eVillager"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: DIAMOND_SWORD
+    durability: 0
+    gui-slot: 32

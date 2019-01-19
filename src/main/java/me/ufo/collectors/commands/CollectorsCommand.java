@@ -21,7 +21,7 @@ public class CollectorsCommand extends BaseCommand {
     @Subcommand("increment")
     public void onCollectorsIncrementCommand(CommandSender sender) {
         Collector.getCollectorCache().forEach((k, collector) -> {
-            collector.increment(CollectionType.CREEPER);
+            collector.increment(CollectionType.TNT);
             collector.increment(CollectionType.CACTUS);
         });
     }
@@ -29,7 +29,7 @@ public class CollectorsCommand extends BaseCommand {
     @Subcommand("decrement")
     public void onCollectorsDecrementCommand(CommandSender sender) {
         Collector.getCollectorCache().forEach((k, collector) -> {
-            collector.decrement(CollectionType.CREEPER, 1);
+            collector.decrement(CollectionType.TNT, 1);
             collector.decrement(CollectionType.CACTUS, 1);
         });
     }

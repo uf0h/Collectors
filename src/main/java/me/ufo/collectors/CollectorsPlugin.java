@@ -12,6 +12,7 @@ import me.ufo.collectors.listeners.EntityListener;
 import me.ufo.collectors.listeners.InventoryListener;
 import me.ufo.collectors.listeners.PlayerListener;
 import me.ufo.collectors.tasks.CollectorSaveThread;
+import me.ufo.collectors.util.Skulls;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,6 +54,8 @@ public class CollectorsPlugin extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
         }
 
+        this.initializeUtilities();
+
         this.registerCommands(new PaperCommandManager(this),
                 new CollectorsCommand());
 
@@ -78,6 +81,10 @@ public class CollectorsPlugin extends JavaPlugin {
         for (Listener listener : listeners) {
             this.getServer().getPluginManager().registerEvents(listener, this);
         }
+    }
+
+    private void initializeUtilities() {
+        new Skulls().loadSkullsIntoCache();
     }
 
 }

@@ -8,6 +8,7 @@ import me.ufo.collectors.util.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,7 +20,7 @@ public class CollectorGUI extends GUI {
 
     public CollectorGUI(Collector collector) {
         this.collector = collector;
-        this.inventory = Bukkit.createInventory(this, 45, ChatColor.DARK_GRAY.toString() + "Collector Sell Menu");
+        this.inventory = Bukkit.createInventory(this, 45, ChatColor.DARK_GRAY.toString() + "Collector Menu");
 
         for (CollectionType collectionType : CollectionType.values()) {
             inventory.setItem(collectionType.getSlot(), collectionType.getItemStack(this.collector));
@@ -42,8 +43,14 @@ public class CollectorGUI extends GUI {
             }
 
             final CollectionType collectionType = CollectionType.valueOf(nbtItem.getString("CollectionItem"));
+            final Player player = (Player) event.getWhoClicked();
 
-            collector.decrement(collectionType, 1);
+            if (collector.getAmountOfCollectionType(collectionType) < 100) {
+                player.sendMessage(ChatColor.RED.toString() + "There must be at least 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + " to sell.");
+                return;
+            }
+
+            collector.decrement(collectionType, 100);
             this.update(collectionType);
         });
     }
