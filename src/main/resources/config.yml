@@ -1,0 +1,22 @@
+collection-types:
+  CACTUS:
+    name: "&eCactus"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: CACTUS
+    durability: 0
+    gui-slot: 12
+  CREEPER:
+    name: "&eCreeper"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 50
+    gui-slot: 13
+  PIG:
+    name: "&ePig"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: DIAMOND_SWORD
+    durability: 0
+    gui-slot: 14

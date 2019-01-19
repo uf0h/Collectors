@@ -37,7 +37,8 @@ public class CollectorsCommand extends BaseCommand {
     @Subcommand("check")
     public void onCollectorsCheckCommand(CommandSender sender) {
         Collector.getCollectorCache().forEach((k, collector) -> {
-            sender.sendMessage(k + " " + collector.getAmounts().toString() + " " + collector.getLocation());
+            sender.sendMessage(k + " " + collector.getAmounts().toString() + " " + collector.getLocation()) ;
+            sender.sendMessage("inv null: " + (collector.getCollectorGUI() == null) + " viewers: " + collector.getViewers().size());
         });
     }
 

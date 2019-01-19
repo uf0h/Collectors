@@ -4,12 +4,15 @@ import com.google.gson.reflect.TypeToken;
 import lombok.Data;
 import lombok.Getter;
 import me.ufo.collectors.CollectorsPlugin;
+import me.ufo.collectors.gui.CollectorGUI;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +26,7 @@ public class Collector {
     private ConcurrentHashMap<CollectionType, Integer> amounts = new ConcurrentHashMap<>();
     private Location location;
 
+    private transient CollectorGUI collectorGUI;
     private transient Set<UUID> viewers = new HashSet<>();
 
     public Collector(Location location) {
@@ -42,14 +46,17 @@ public class Collector {
 
     public void increment(CollectionType collectionType) {
         this.amounts.put(collectionType, this.amounts.get(collectionType) + 1);
+        if (this.collectorGUI != null) this.collectorGUI.update(collectionType);
     }
 
     public void increment(CollectionType collectionType, int amount) {
         this.amounts.put(collectionType, this.amounts.get(collectionType) + amount);
+        if (this.collectorGUI != null) this.collectorGUI.update(collectionType);
     }
 
     public void decrement(CollectionType collectionType, int amount) {
-        this.amounts.put(collectionType, (this.amounts.get(collectionType) - amount) < 0 ? this.amounts.get(collectionType) - amount : 0);
+        this.amounts.put(collectionType, (this.amounts.get(collectionType) - amount) < 0 ? 0 : this.amounts.get(collectionType) - amount);
+        if (this.collectorGUI != null) this.collectorGUI.update(collectionType);
     }
 
     public void remove() {
@@ -60,8 +67,33 @@ public class Collector {
         collectorCache.remove(serialize(this.location));
     }
 
-    public int getAmountOfCollectionType(CollectionType collectionType) {
-        return this.amounts.get(collectionType);
+    public void openInventory(Player player) {
+        if (this.collectorGUI == null) {
+            this.collectorGUI = new CollectorGUI(Collector.this);
+        }
+
+        player.openInventory(this.collectorGUI.getInventory());
+        this.viewers.add(player.getUniqueId());
+    }
+
+    private void deleteInventory() {
+        this.collectorGUI.getInventory().clear();
+        this.collectorGUI.setInventory(null);
+        this.collectorGUI.setConsumer(null);
+        this.collectorGUI = null;
+    }
+
+    public static void removeViewer(UUID uuid) {
+        CollectorsPlugin.getInstance().getServer().getScheduler().runTaskAsynchronously(CollectorsPlugin.getInstance(), () -> {
+            for (Map.Entry<String, Collector> map : collectorCache.entrySet()) {
+                if (map.getValue().getViewers().contains(uuid)) {
+                    map.getValue().getViewers().remove(uuid);
+
+                    if (map.getValue().getViewers().isEmpty()) map.getValue().deleteInventory();
+                    break;
+                }
+            }
+        });
     }
 
     public static boolean chunkHasCollector(Location location) {
@@ -71,6 +103,10 @@ public class Collector {
     public static boolean isCollector(Location location) {
         if (collectorCache.isEmpty()) return false;
         return collectorCache.get(serialize(location)).getLocation().toString().equals(location.toString());
+    }
+
+    public int getAmountOfCollectionType(CollectionType collectionType) {
+        return this.amounts.get(collectionType);
     }
 
     public static String serialize(Location location) {
@@ -106,7 +142,8 @@ public class Collector {
     private static CompletableFuture<ConcurrentHashMap<String, Collector>> load() {
         return CompletableFuture.supplyAsync(() -> {
             try (FileReader reader = new FileReader(CollectorsPlugin.getInstance().getDataFolder().toString() + "/data.json")) {
-                return CollectorsPlugin.getInstance().getGson().fromJson(reader, new TypeToken<ConcurrentHashMap<String, Collector>>() {}.getType());
+                return CollectorsPlugin.getInstance().getGson().fromJson(reader, new TypeToken<ConcurrentHashMap<String, Collector>>() {
+                }.getType());
             } catch (IOException e) {
                 CollectorsPlugin.getInstance().getLogger().warning("Failed to load collectors.");
                 return null;

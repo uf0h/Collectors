@@ -8,11 +8,16 @@ import lombok.Getter;
 import me.ufo.collectors.adapters.LocationTypeAdapter;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
+import me.ufo.collectors.listeners.EntityListener;
+import me.ufo.collectors.listeners.InventoryListener;
 import me.ufo.collectors.listeners.PlayerListener;
 import me.ufo.collectors.tasks.CollectorSaveThread;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
 
 @Getter
 public class CollectorsPlugin extends JavaPlugin {
@@ -20,6 +25,18 @@ public class CollectorsPlugin extends JavaPlugin {
     @Getter private static CollectorsPlugin instance;
 
     private Gson gson;
+
+    public CollectorsPlugin() {
+        this.saveDefaultConfig();
+        File dataFile = new File(this.getDataFolder() + "/data.json");
+        if (!dataFile.exists()) {
+            try {
+                dataFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -39,7 +56,7 @@ public class CollectorsPlugin extends JavaPlugin {
         this.registerCommands(new PaperCommandManager(this),
                 new CollectorsCommand());
 
-        this.registerListeners(new PlayerListener());
+        this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener());
 
         this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
