@@ -27,6 +27,8 @@ public class CollectorsPlugin extends JavaPlugin {
 
     private Gson gson;
 
+    private CollectorSaveThread collectorSaveThread;
+
     public CollectorsPlugin() {
         this.saveDefaultConfig();
         File dataFile = new File(this.getDataFolder() + "/data.json");
@@ -63,11 +65,17 @@ public class CollectorsPlugin extends JavaPlugin {
 
         this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
-        this.getServer().getScheduler().runTaskLater(this, () -> new CollectorSaveThread().start(), 100L);
+        this.collectorSaveThread = new CollectorSaveThread();
+
+        this.getServer().getScheduler().runTaskLater(this, () -> this.collectorSaveThread.start(), 100L);
     }
 
     @Override
     public void onDisable() {
+        this.collectorSaveThread.interrupt();
+        this.collectorSaveThread.stop();
+        this.collectorSaveThread = null;
+
         Collector.saveall();
     }
 
