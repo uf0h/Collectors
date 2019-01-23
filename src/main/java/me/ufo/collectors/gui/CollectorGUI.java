@@ -2,6 +2,7 @@ package me.ufo.collectors.gui;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.util.NBTItem;
@@ -25,6 +26,8 @@ public class CollectorGUI extends GUI {
         for (CollectionType collectionType : CollectionType.values()) {
             inventory.setItem(collectionType.getSlot(), collectionType.getItemStack(this.collector));
         }
+
+        this.collector.getViewers().forEach(viewer -> CollectorsPlugin.getInstance().getServer().getPlayer(viewer).updateInventory());
 
         this.setConsumer(event -> {
             final ItemStack item = event.getCurrentItem();
@@ -63,6 +66,7 @@ public class CollectorGUI extends GUI {
             itemStack.setItemMeta(itemMeta);
 
             this.inventory.setItem(collectionType.getSlot(), itemStack);
+            this.collector.getViewers().forEach(viewer -> CollectorsPlugin.getInstance().getServer().getPlayer(viewer).updateInventory());
         }
     }
 
