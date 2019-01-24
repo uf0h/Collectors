@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class PlayerListener implements Listener {
@@ -39,6 +40,17 @@ public class PlayerListener implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onEntityExplodeEvent(EntityExplodeEvent event) {
+        event.blockList().stream().filter(block -> block.getType() == Material.BEACON).forEach(block -> {
+            if (Collector.chunkHasCollector(block.getLocation())) {
+                if (Collector.isCollector(block.getLocation())) {
+                    Collector.get(block.getLocation()).remove();
+                }
+            }
+        });
     }
 
     @EventHandler
