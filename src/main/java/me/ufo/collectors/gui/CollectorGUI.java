@@ -5,6 +5,7 @@ import lombok.Setter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
+import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.util.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -71,7 +72,13 @@ public class CollectorGUI extends GUI {
                         return;
                     }
 
-                    this.collector.decrement(collectionType, 100);
+                    if (Econ.depositAmountToPlayer(player, (100 * collectionType.getSellPrice()))) {
+                        this.collector.decrement(collectionType, 100);
+                        player.sendMessage(ChatColor.GREEN.toString() + "+$" + (100 * collectionType.getSellPrice()) + ChatColor.RED.toString() + " from selling 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
+                    } else {
+                        player.sendMessage(ChatColor.RED.toString() + "Error: Unable to sell 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
+                        return;
+                    }
                     break;
             }
 

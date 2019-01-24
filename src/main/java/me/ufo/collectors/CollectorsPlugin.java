@@ -9,6 +9,7 @@ import me.ufo.collectors.adapters.LocationTypeAdapter;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
+import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.listeners.EntityListener;
 import me.ufo.collectors.listeners.InventoryListener;
 import me.ufo.collectors.listeners.PlayerListener;
@@ -16,7 +17,6 @@ import me.ufo.collectors.listeners.ShutdownListener;
 import me.ufo.collectors.tasks.CollectorSaveThread;
 import me.ufo.collectors.util.Skulls;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,6 +49,8 @@ public class CollectorsPlugin extends JavaPlugin {
         long startTime = System.currentTimeMillis();
 
         instance = this;
+
+        this.registerDependencies();
 
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(Location.class, new LocationTypeAdapter())
@@ -83,6 +85,10 @@ public class CollectorsPlugin extends JavaPlugin {
         this.disableCollectorSaveThread();
 
         Collector.saveall();
+    }
+
+    private void registerDependencies() {
+        new Econ().setup();
     }
 
     private void registerCommands(PaperCommandManager paperCommandManager, BaseCommand... baseCommands) {
