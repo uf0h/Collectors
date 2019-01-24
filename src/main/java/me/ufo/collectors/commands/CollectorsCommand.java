@@ -21,16 +21,16 @@ public class CollectorsCommand extends BaseCommand {
     @Subcommand("increment")
     public void onCollectorsIncrementCommand(CommandSender sender) {
         Collector.getCollectorCache().forEach((k, collector) -> {
-            collector.increment(CollectionType.TNT);
-            collector.increment(CollectionType.CACTUS);
+            collector.increment(CollectionType.CREEPER, 100);
+            collector.increment(CollectionType.CACTUS, 100);
         });
     }
 
     @Subcommand("decrement")
     public void onCollectorsDecrementCommand(CommandSender sender) {
         Collector.getCollectorCache().forEach((k, collector) -> {
-            collector.decrement(CollectionType.TNT, 1);
-            collector.decrement(CollectionType.CACTUS, 1);
+            collector.decrement(CollectionType.CREEPER, 100);
+            collector.decrement(CollectionType.CACTUS, 100);
         });
     }
 

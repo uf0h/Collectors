@@ -1,6 +1,7 @@
 package me.ufo.collectors.collector;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.util.NBTItem;
 import me.ufo.collectors.util.Skulls;
@@ -18,8 +19,8 @@ public enum CollectionType {
 
     CACTUS(Material.CACTUS),
     SUGAR_CANE(Material.SUGAR_CANE),
-    TNT(Material.TNT),
 
+    CREEPER(EntityType.CREEPER),
     PIG(EntityType.PIG),
     COW(EntityType.COW),
     PIG_ZOMBIE(EntityType.PIG_ZOMBIE),
@@ -29,6 +30,7 @@ public enum CollectionType {
 
     @Getter private Material material;
     @Getter private EntityType entityType;
+    @Getter @Setter private double sellPrice;
 
     CollectionType(Material material) {
         this.material = material;
@@ -36,6 +38,21 @@ public enum CollectionType {
 
     CollectionType(EntityType entityType) {
         this.entityType = entityType;
+    }
+
+    // ... store sell prices
+    public static boolean initialize(CollectorsPlugin plugin) {
+        for (CollectionType collectionType : CollectionType.values()) {
+            if (collectionType == CollectionType.CREEPER) continue;
+            final String PATH = "collection-types." + collectionType + ".sell-price";
+
+            if (plugin.getConfig().get(PATH) != null) {
+                collectionType.setSellPrice(plugin.getConfig().getDouble(PATH));
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static CollectionType parse(EntityType entityType) {
@@ -69,7 +86,7 @@ public enum CollectionType {
             case SUGAR_CANE:
                 itemStack = Skulls.Skull.SUGARCANE.get();
                 break;
-            case TNT:
+            case CREEPER:
                 itemStack = Skulls.Skull.TNT.get();
                 break;
             case PIG:

@@ -6,14 +6,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import me.ufo.collectors.adapters.LocationTypeAdapter;
+import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
 import me.ufo.collectors.listeners.EntityListener;
 import me.ufo.collectors.listeners.InventoryListener;
 import me.ufo.collectors.listeners.PlayerListener;
+import me.ufo.collectors.listeners.ShutdownListener;
 import me.ufo.collectors.tasks.CollectorSaveThread;
 import me.ufo.collectors.util.Skulls;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -51,8 +54,13 @@ public class CollectorsPlugin extends JavaPlugin {
                 .registerTypeAdapter(Location.class, new LocationTypeAdapter())
                     .disableHtmlEscaping().setPrettyPrinting().create();
 
-        if (!Collector.initialize()) {
+        if (!Collector.initialize(this)) {
             this.getLogger().warning("Collectors have failed to be loaded into memory.");
+            this.getServer().getPluginManager().disablePlugin(this);
+        }
+
+        if (!CollectionType.initialize(this)) {
+            this.getLogger().warning("Collector prices have failed to register.");
             this.getServer().getPluginManager().disablePlugin(this);
         }
 
@@ -61,7 +69,7 @@ public class CollectorsPlugin extends JavaPlugin {
         this.registerCommands(new PaperCommandManager(this),
                 new CollectorsCommand());
 
-        this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener());
+        this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener());
 
         this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
@@ -72,9 +80,7 @@ public class CollectorsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.collectorSaveThread.interrupt();
-        this.collectorSaveThread.stop();
-        this.collectorSaveThread = null;
+        this.disableCollectorSaveThread();
 
         Collector.saveall();
     }
@@ -93,6 +99,14 @@ public class CollectorsPlugin extends JavaPlugin {
 
     private void initializeUtilities() {
         new Skulls().loadSkullsIntoCache();
+    }
+
+    public void disableCollectorSaveThread() {
+        if (this.collectorSaveThread != null) {
+            this.collectorSaveThread.interrupt();
+            this.collectorSaveThread.stop();
+            this.collectorSaveThread = null;
+        }
     }
 
 }

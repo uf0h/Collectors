@@ -1,3 +1,5 @@
+# Creeper has no sell price as it's function is to give TNT.
+
 collection-types:
   CACTUS:
     name: "&eCactus"
@@ -6,6 +8,7 @@ collection-types:
     material: CACTUS
     durability: 0
     gui-slot: 12
+    sell-price: 1.0
   SUGAR_CANE:
     name: "&eSugarcane"
     lore:
@@ -13,7 +16,8 @@ collection-types:
     material: MONSTER_EGG
     durability: 50
     gui-slot: 13
-  TNT:
+    sell-price: 12.5
+  CREEPER:
     name: "&eTNT"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
@@ -27,6 +31,7 @@ collection-types:
     material: DIAMOND_SWORD
     durability: 0
     gui-slot: 21
+    sell-price: 0.5
   COW:
     name: "&eCow"
     lore:
@@ -34,6 +39,7 @@ collection-types:
     material: DIAMOND_SWORD
     durability: 0
     gui-slot: 22
+    sell-price: 3.0
   PIG_ZOMBIE:
     name: "&eZombie Pigmen"
     lore:
@@ -41,6 +47,7 @@ collection-types:
     material: DIAMOND_SWORD
     durability: 0
     gui-slot: 23
+    sell-price: 13.5
   ENDERMAN:
     name: "&eEndermen"
     lore:
@@ -48,6 +55,7 @@ collection-types:
     material: DIAMOND_SWORD
     durability: 0
     gui-slot: 30
+    sell-price: 11.0
   IRON_GOLEM:
     name: "&eIron Golem"
     lore:
@@ -55,6 +63,7 @@ collection-types:
     material: DIAMOND_SWORD
     durability: 0
     gui-slot: 31
+    sell-price: 75.0
   VILLAGER:
     name: "&eVillager"
     lore:
@@ -62,3 +71,4 @@ collection-types:
     material: DIAMOND_SWORD
     durability: 0
     gui-slot: 32
+    sell-price: 35.0

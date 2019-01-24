@@ -118,7 +118,7 @@ public class Collector {
                 .append(location.getChunk().getZ()).toString();
     }
 
-    public static boolean initialize() {
+    public static boolean initialize(CollectorsPlugin plugin) {
         CompletableFuture<ConcurrentHashMap<String, Collector>> collectors = load();
 
         try {
@@ -129,7 +129,7 @@ public class Collector {
                     v.viewers = new HashSet<>();
                 });
 
-                CollectorsPlugin.getInstance().getLogger().info("Collectors have been loaded into memory (" + collectorCache.size() + ").");
+                plugin.getLogger().info("Collectors have been loaded into memory (" + collectorCache.size() + ").");
             }
         } catch (Exception e) {
             e.printStackTrace();
