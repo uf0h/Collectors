@@ -20,7 +20,7 @@ collection-types:
   CREEPER:
     name: "&eTNT"
     lore:
-      - "&7You currently have &e%amount% &7available to sell."
+      - "&7You currently have &e%amount% &7available to withdraw."
     material: MONSTER_EGG
     durability: 50
     gui-slot: 14
