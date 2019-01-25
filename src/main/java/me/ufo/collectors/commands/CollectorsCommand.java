@@ -1,14 +1,19 @@
 package me.ufo.collectors.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Dependency;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
+import co.aikar.commands.contexts.OnlinePlayer;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
+import me.ufo.collectors.item.CollectorItem;
+import me.ufo.collectors.util.NBTItem;
+import me.ufo.collectors.util.Style;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 @CommandAlias("collectors|collector")
 @CommandPermission("venom.admin")
@@ -45,6 +50,12 @@ public class CollectorsCommand extends BaseCommand {
     @Subcommand("size")
     public void onCollectorsSizeCommand(CommandSender sender) {
         sender.sendMessage("size: " + Collector.getCollectorCache().size());
+    }
+
+    @Subcommand("give")
+    @CommandCompletion("@players")
+    public void onCollectorsGiveCommand(CommandSender sender, OnlinePlayer target) {
+        target.getPlayer().getInventory().addItem(CollectorItem.get());
     }
 
 }

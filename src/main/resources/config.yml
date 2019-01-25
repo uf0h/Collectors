@@ -1,5 +1,10 @@
 # Creeper has no sell price as it's function is to give TNT.
 
+collector-item:
+  name: "&b&lCollector"
+  lore:
+    - "&7Automatically collect certain drops in a chunk."
+
 collection-types:
   CACTUS:
     name: "&eCactus"
