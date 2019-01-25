@@ -10,10 +10,9 @@ import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
 import me.ufo.collectors.integration.Econ;
-import me.ufo.collectors.listeners.EntityListener;
-import me.ufo.collectors.listeners.InventoryListener;
-import me.ufo.collectors.listeners.PlayerListener;
-import me.ufo.collectors.listeners.ShutdownListener;
+import me.ufo.collectors.integration.Factions;
+import me.ufo.collectors.integration.Worldguard;
+import me.ufo.collectors.listeners.*;
 import me.ufo.collectors.tasks.CollectorSaveThread;
 import me.ufo.collectors.util.Skulls;
 import org.bukkit.Location;
@@ -71,7 +70,7 @@ public class CollectorsPlugin extends JavaPlugin {
         this.registerCommands(new PaperCommandManager(this),
                 new CollectorsCommand());
 
-        this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener());
+        this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener(), new FactionListener());
 
         this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
@@ -89,6 +88,8 @@ public class CollectorsPlugin extends JavaPlugin {
 
     private void registerDependencies() {
         new Econ().setup();
+        new Factions().setup();
+        new Worldguard().setup();
     }
 
     private void registerCommands(PaperCommandManager paperCommandManager, BaseCommand... baseCommands) {

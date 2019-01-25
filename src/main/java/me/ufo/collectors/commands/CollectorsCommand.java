@@ -7,13 +7,11 @@ import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.item.CollectorItem;
-import me.ufo.collectors.util.NBTItem;
-import me.ufo.collectors.util.Style;
-import org.bukkit.Material;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 
 @CommandAlias("collectors|collector")
 @CommandPermission("venom.admin")
@@ -56,6 +54,31 @@ public class CollectorsCommand extends BaseCommand {
     @CommandCompletion("@players")
     public void onCollectorsGiveCommand(CommandSender sender, OnlinePlayer target) {
         target.getPlayer().getInventory().addItem(CollectorItem.get());
+    }
+
+    @Subcommand("set")
+    public void onCollectorsSetCommand(Player player) {
+        if (Collector.chunkHasCollector(player.getLocation())) {
+            if (Collector.isCollector(player.getLocation().subtract(new Vector(0, 0.5, 0)).getBlock().getLocation())) {
+                player.sendMessage("this is a collector");
+            } else {
+                player.sendMessage("this is not the collector");
+            }
+        } else {
+            player.sendMessage("there is no collector in this chunk.");
+        }
+    }
+
+    @Subcommand("remove")
+    public void onCollectorsRemoveCommand(Player player) {
+        if (Collector.chunkHasCollector(player.getLocation())) {
+            final Location location = Collector.get(player.getLocation()).getLocation();
+            Collector.get(player.getLocation()).remove(true);
+            player.sendMessage(ChatColor.RED.toString() + "Collector removed from x: " + location.getBlockX() + ", y: " + location.getBlockY() + ", z: " + location.getBlockZ() + ".");
+
+        } else {
+            player.sendMessage(ChatColor.RED.toString() + "There is no collector in this chunk.");
+        }
     }
 
 }

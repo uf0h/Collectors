@@ -1,7 +1,11 @@
 package me.ufo.collectors.listeners;
 
+import com.massivecraft.factions.entity.BoardColl;
+import com.massivecraft.massivecore.ps.PS;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
+import me.ufo.collectors.integration.Factions;
+import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,9 +21,24 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+
         if (event.getBlockPlaced().getType() == Material.BEACON) {
             if (event.getItemInHand() != null) {
                 if (this.isCollectorItem(event.getItemInHand())) {
+
+                    if (!Factions.playerCanPlaceHere(event.getPlayer(), event.getBlock()) ||
+                            !Worldguard.playerCanPlaceHere(event.getPlayer(), event.getBlock())) {
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    if (BoardColl.get().getFactionAt(PS.valueOf(event.getBlock())).isNone()) {
+                        event.getPlayer().sendMessage(ChatColor.RED.toString() + "Collectors must be placed in your claimed faction land.");
+                        event.setCancelled(true);
+                        return;
+                    }
+
                     if (Collector.chunkHasCollector(event.getBlockPlaced().getLocation())) {
                         event.setCancelled(true);
 
@@ -44,11 +63,19 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event) {
+        if (event.isCancelled()) return;
+
         if (event.getBlock().getType() == Material.BEACON) {
             if (Collector.chunkHasCollector(event.getBlock().getLocation())) {
                 if (Collector.isCollector(event.getBlock().getLocation())) {
-                    Collector.get(event.getBlock().getLocation()).remove();
-                    event.getBlock().setType(Material.AIR);
+
+                    if (!Factions.playerCanPlaceHere(event.getPlayer(), event.getBlock()) ||
+                            !Worldguard.playerCanPlaceHere(event.getPlayer(), event.getBlock())) {
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    Collector.get(event.getBlock().getLocation()).remove(true);
                     event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), CollectorItem.get());
 
                     event.getPlayer().sendMessage(ChatColor.RED.toString() + "You have removed a collector from this chunk.");
@@ -62,8 +89,7 @@ public class PlayerListener implements Listener {
         event.blockList().stream().filter(block -> block.getType() == Material.BEACON).forEach(block -> {
             if (Collector.chunkHasCollector(block.getLocation())) {
                 if (Collector.isCollector(block.getLocation())) {
-                    Collector.get(block.getLocation()).remove();
-                    block.setType(Material.AIR);
+                    Collector.get(block.getLocation()).remove(true);
                     block.getWorld().dropItem(block.getLocation(), CollectorItem.get());
                 }
             }
@@ -79,11 +105,13 @@ public class PlayerListener implements Listener {
 
                     switch (event.getAction()) {
                         case LEFT_CLICK_BLOCK:
-                            double totalValue = collector.getAmounts().entrySet().stream()
-                                    .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
-                                    .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
+                            if (event.getPlayer().getItemInHand() == null || event.getPlayer().getItemInHand().getType() == Material.AIR) {
+                                double totalValue = collector.getAmounts().entrySet().stream()
+                                        .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
+                                        .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
 
-                            event.getPlayer().sendMessage(ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN.toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
+                                event.getPlayer().sendMessage(ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN.toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
+                            }
                             break;
                         case RIGHT_CLICK_BLOCK:
                             event.setCancelled(true);

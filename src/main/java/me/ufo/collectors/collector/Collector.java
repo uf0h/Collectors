@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.gui.CollectorGUI;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.io.FileReader;
@@ -44,6 +45,10 @@ public class Collector {
         return collectorCache.get(serialize(location));
     }
 
+    /*public static Collector get(String world, int chunkX, int chunkZ) {
+        return collectorCache.get(serialize(world, chunkX, chunkZ));
+    }*/
+
     public void increment(CollectionType collectionType) {
         this.amounts.put(collectionType, this.amounts.get(collectionType) + 1);
         if (this.collectorGUI != null) this.collectorGUI.update(collectionType);
@@ -59,10 +64,12 @@ public class Collector {
         if (this.collectorGUI != null) this.collectorGUI.update(collectionType);
     }
 
-    public void remove() {
+    public void remove(boolean removeBlock) {
         this.amounts.clear();
         this.viewers.forEach(uuid -> CollectorsPlugin.getInstance().getServer().getPlayer(uuid).closeInventory());
         this.viewers.clear();
+
+        if (removeBlock) this.location.getBlock().setType(Material.AIR);
 
         collectorCache.remove(serialize(this.location));
     }
@@ -96,6 +103,10 @@ public class Collector {
         });
     }
 
+    public static boolean chunkHasCollector(String world, int chunkX, int chunkZ) {
+        return collectorCache.containsKey(serialize(world, chunkX, chunkZ));
+    }
+
     public static boolean chunkHasCollector(Location location) {
         return collectorCache.containsKey(serialize(location));
     }
@@ -107,6 +118,15 @@ public class Collector {
 
     public int getAmountOfCollectionType(CollectionType collectionType) {
         return this.amounts.get(collectionType);
+    }
+
+    public static String serialize(String world, int chunkX, int chunkZ) {
+        return new StringBuilder()
+                .append(world)
+                .append("::")
+                .append(chunkX)
+                .append("::")
+                .append(chunkZ).toString();
     }
 
     public static String serialize(Location location) {
