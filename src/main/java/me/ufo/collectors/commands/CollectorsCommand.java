@@ -52,15 +52,25 @@ public class CollectorsCommand extends BaseCommand {
 
     @Subcommand("give")
     @CommandCompletion("@players")
-    public void onCollectorsGiveCommand(CommandSender sender, OnlinePlayer target) {
-        target.getPlayer().getInventory().addItem(CollectorItem.get());
+    public void onCollectorsGiveCommand(CommandSender sender, OnlinePlayer target, String amount) {
+        int amountI;
+        try {
+            amountI = Integer.parseInt(amount);
+        } catch (NumberFormatException e) {
+            amountI = 1;
+        }
+
+        target.getPlayer().getInventory().addItem(CollectorItem.get(amountI));
     }
 
     @Subcommand("set")
-    public void onCollectorsSetCommand(Player player) {
+    public void onCollectorsSetCommand(Player player, int amount) {
         if (Collector.chunkHasCollector(player.getLocation())) {
             if (Collector.isCollector(player.getLocation().subtract(new Vector(0, 0.5, 0)).getBlock().getLocation())) {
                 player.sendMessage("this is a collector");
+                final Collector collector = Collector.get(player.getLocation().subtract(new Vector(0, 0.5, 0)).getBlock().getLocation());
+
+                collector.increment(CollectionType.CREEPER, amount);
             } else {
                 player.sendMessage("this is not the collector");
             }

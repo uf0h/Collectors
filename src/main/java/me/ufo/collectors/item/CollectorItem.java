@@ -22,4 +22,14 @@ public class CollectorItem {
         return item;
     }
 
+    public static ItemStack get(int amount) {
+        ItemStack item = new ItemStack(Material.BEACON, amount);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setDisplayName(Style.translate(config.getString(PATH + "name")));
+        itemMeta.setLore(Style.translateLines(config.getStringList(PATH + "lore")));
+        item.setItemMeta(itemMeta);
+
+        return item;
+    }
+
 }

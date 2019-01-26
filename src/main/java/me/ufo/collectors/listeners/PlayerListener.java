@@ -1,9 +1,13 @@
 package me.ufo.collectors.listeners;
 
 import com.massivecraft.factions.entity.BoardColl;
+import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.ps.PS;
+import me.aceix8.outposts.AceOutposts;
+import me.aceix8.outposts.api.OutpostAPI;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
+import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
@@ -18,6 +22,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class PlayerListener implements Listener {
+
+    private static final OutpostAPI OUTPOST_API = AceOutposts.getInstance().getApi();
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
@@ -115,6 +121,32 @@ public class PlayerListener implements Listener {
                             break;
                         case RIGHT_CLICK_BLOCK:
                             event.setCancelled(true);
+
+                            if (event.getPlayer().isSneaking() && event.getPlayer().hasPermission("venom.anaconda")) {
+                                double totalValue = collector.getAmounts().entrySet().stream()
+                                        .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
+                                        .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
+
+                                if (totalValue == 0) {
+                                    event.getPlayer().sendMessage(ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN.toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
+                                    return;
+                                }
+
+                                if (OUTPOST_API.isFactionControllingAnOutpost(MPlayer.get(event.getPlayer()).getFaction())) {
+                                    totalValue *= 2;
+                                    event.getPlayer().sendMessage(ChatColor.RED.toString() + "You will receive " + ChatColor.GREEN.toString() + "x2" + ChatColor.RED.toString() + " value as you are controlling outpost.");
+                                }
+
+                                collector.getAmounts().entrySet().stream()
+                                        .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
+                                        .forEach(entry -> entry.setValue(0));
+
+                                if (Econ.depositAmountToPlayer(event.getPlayer(), totalValue)) {
+                                    event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "+$" + totalValue + ChatColor.RED.toString() + " from selling everything in this collector.");
+                                }
+
+                                return;
+                            }
 
                             collector.openInventory(event.getPlayer());
                             break;

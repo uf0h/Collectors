@@ -75,6 +75,12 @@
             <version>6.2</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>me.aceix8</groupId>
+            <artifactId>outposts</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 

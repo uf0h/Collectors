@@ -81,6 +81,10 @@ public class CollectorsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Collector.getCollectorCache().forEach((s, collector) -> {
+            collector.getViewers().forEach(uuid -> this.getServer().getPlayer(uuid).closeInventory());
+        });
+
         this.disableCollectorSaveThread();
 
         Collector.saveall();

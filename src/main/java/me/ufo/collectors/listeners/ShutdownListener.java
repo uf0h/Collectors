@@ -1,6 +1,7 @@
 package me.ufo.collectors.listeners;
 
 import me.ufo.collectors.CollectorsPlugin;
+import me.ufo.collectors.collector.Collector;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -19,6 +20,10 @@ public class ShutdownListener implements Listener {
             // ... Due to certain plugins (mcMMO) holding up the disabling process ...
             // ... we must disable the collector save thread manually.
             this.plugin.disableCollectorSaveThread();
+
+            Collector.getCollectorCache().forEach((s, collector) -> {
+                collector.getViewers().forEach(uuid -> this.plugin.getServer().getPlayer(uuid).closeInventory());
+            });
         }
     }
 

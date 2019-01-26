@@ -1,7 +1,10 @@
 package me.ufo.collectors.gui;
 
+import com.massivecraft.factions.entity.MPlayer;
 import lombok.Getter;
 import lombok.Setter;
+import me.aceix8.outposts.AceOutposts;
+import me.aceix8.outposts.api.OutpostAPI;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
@@ -17,6 +20,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CollectorGUI extends GUI {
 
+    private static final OutpostAPI OUTPOST_API = AceOutposts.getInstance().getApi();
+
+
     @Getter @Setter private Inventory inventory;
     private Collector collector;
 
@@ -24,11 +30,13 @@ public class CollectorGUI extends GUI {
         this.collector = collector;
         this.inventory = Bukkit.createInventory(this, 45, ChatColor.DARK_GRAY.toString() + "Collector Menu");
 
-        for (CollectionType collectionType : CollectionType.values()) {
-            inventory.setItem(collectionType.getSlot(), collectionType.getItemStack(this.collector));
-        }
+        CollectorsPlugin.getInstance().getServer().getScheduler().runTask(CollectorsPlugin.getInstance(), () -> {
+            for (CollectionType collectionType : CollectionType.values()) {
+                inventory.setItem(collectionType.getSlot(), collectionType.getItemStack(this.collector));
+            }
 
-        this.collector.getViewers().forEach(viewer -> CollectorsPlugin.getInstance().getServer().getPlayer(viewer).updateInventory());
+            this.collector.getViewers().forEach(viewer -> CollectorsPlugin.getInstance().getServer().getPlayer(viewer).updateInventory());
+        });
 
         this.setConsumer(event -> {
             final ItemStack item = event.getCurrentItem();
@@ -72,9 +80,15 @@ public class CollectorGUI extends GUI {
                         return;
                     }
 
-                    if (Econ.depositAmountToPlayer(player, (100 * collectionType.getSellPrice()))) {
+                    double sellPrice = collectionType.getSellPrice();
+
+                    if (OUTPOST_API.isFactionControllingAnOutpost(MPlayer.get(player).getFaction())) {
+                        sellPrice *= 2;
+                    }
+
+                    if (Econ.depositAmountToPlayer(player, (100 * sellPrice))) {
                         this.collector.decrement(collectionType, 100);
-                        player.sendMessage(ChatColor.GREEN.toString() + "+$" + (100 * collectionType.getSellPrice()) + ChatColor.RED.toString() + " from selling 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
+                        player.sendMessage(ChatColor.GREEN.toString() + "+$" + (100 * sellPrice) + ChatColor.RED.toString() + " from selling 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
                     } else {
                         player.sendMessage(ChatColor.RED.toString() + "Error: Unable to sell 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
                         return;
