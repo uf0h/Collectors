@@ -1,7 +1,5 @@
 package me.ufo.collectors;
 
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -9,6 +7,8 @@ import me.ufo.collectors.adapters.LocationTypeAdapter;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
+import me.ufo.collectors.fastblockupdate.FastBlockUpdate;
+import me.ufo.collectors.fastblockupdate.impl.FastBlockUpdate_1_8_R3;
 import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Outpost;
@@ -27,6 +27,8 @@ import java.io.IOException;
 public class CollectorsPlugin extends JavaPlugin {
 
     @Getter private static CollectorsPlugin instance;
+
+    private FastBlockUpdate fastBlockUpdate;
 
     private Gson gson;
 
@@ -68,10 +70,11 @@ public class CollectorsPlugin extends JavaPlugin {
 
         this.initializeUtilities();
 
-        this.registerCommands(new PaperCommandManager(this),
-                new CollectorsCommand());
+        this.getCommand("collectors").setExecutor(new CollectorsCommand());
 
         this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener(), new FactionListener());
+
+        this.fastBlockUpdate = new FastBlockUpdate_1_8_R3();
 
         this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
@@ -96,12 +99,6 @@ public class CollectorsPlugin extends JavaPlugin {
         new Factions().setup();
         new Worldguard().setup();
         new Outpost().setup();
-    }
-
-    private void registerCommands(PaperCommandManager paperCommandManager, BaseCommand... baseCommands) {
-        for (BaseCommand baseCommand : baseCommands) {
-            paperCommandManager.registerCommand(baseCommand);
-        }
     }
 
     private void registerListeners(Listener... listeners) {

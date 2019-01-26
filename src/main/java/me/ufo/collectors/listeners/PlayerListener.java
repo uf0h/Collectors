@@ -3,6 +3,7 @@ package me.ufo.collectors.listeners;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.ps.PS;
+import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
@@ -12,6 +13,8 @@ import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -24,7 +27,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
-        if (event.isCancelled()) return;
+        //if (event.isCancelled()) return;
 
         if (event.getBlockPlaced().getType() == Material.BEACON) {
             if (event.getItemInHand() != null) {
@@ -83,6 +86,32 @@ public class PlayerListener implements Listener {
 
                     event.getPlayer().sendMessage(ChatColor.RED.toString() + "You have removed a collector from this chunk.");
                 }
+            }
+
+            return;
+        }
+
+        if (event.getBlock().getType() == Material.SUGAR_CANE_BLOCK) {
+            if (!Factions.playerCanPlaceHere(event.getPlayer(), event.getBlock()) ||
+                    !Worldguard.playerCanPlaceHere(event.getPlayer(), event.getBlock())) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (Collector.chunkHasCollector(event.getBlock().getLocation())) {
+                event.setCancelled(true);
+
+                final Collector collector = Collector.get(event.getBlock().getLocation());
+                int amountOfCane = 0;
+
+                Block next = event.getBlock();
+                while (next != null && next.getType() == Material.SUGAR_CANE_BLOCK) {
+                    CollectorsPlugin.getInstance().getFastBlockUpdate().run(next.getLocation(), Material.AIR, false);
+                    amountOfCane += 1;
+                    next = next.getRelative(BlockFace.UP);
+                }
+
+                collector.increment(CollectionType.SUGAR_CANE, amountOfCane);
             }
         }
     }

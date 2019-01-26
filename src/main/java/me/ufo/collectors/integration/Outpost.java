@@ -26,7 +26,7 @@ public class Outpost {
     }
 
     private boolean setupOutposts() {
-        if (Bukkit.getServer().getPluginManager().getPlugin("Ace-Outpost") == null) {
+        if (Bukkit.getServer().getPluginManager().getPlugin("Ace-Outposts") == null) {
             return false;
         }
 

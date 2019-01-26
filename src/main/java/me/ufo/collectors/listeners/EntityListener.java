@@ -21,7 +21,7 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onBlockGrowEvent(BlockGrowEvent event) {
-        if (blockCannotGrow(event.getBlock().getWorld(), event.getBlock())) {
+        if (!blockCannotGrow(event.getBlock().getWorld(), event.getBlock())) {
             if (event.getNewState().getType() == Material.CACTUS) {
                 event.setCancelled(true);
                 final Collector collector = Collector.get(event.getBlock().getLocation());
@@ -50,12 +50,12 @@ public class EntityListener implements Listener {
 
         for (EnumDirection enumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
             if (nmsWorld.getType(blockPosition.shift(enumDirection)).getBlock().getMaterial().isBuildable()) {
-                return true;
+                return false;
             }
         }
 
         final net.minecraft.server.v1_8_R3.Block NMSBlock = nmsWorld.getType(blockPosition.down()).getBlock();
-        return NMSBlock != Blocks.CACTUS || NMSBlock != Blocks.SAND;
+        return NMSBlock == Blocks.CACTUS || NMSBlock == Blocks.SAND;
     }
 
 }

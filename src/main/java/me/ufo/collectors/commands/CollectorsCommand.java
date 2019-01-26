@@ -1,27 +1,59 @@
 package me.ufo.collectors.commands;
 
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.*;
-import co.aikar.commands.contexts.OnlinePlayer;
 import me.ufo.collectors.CollectorsPlugin;
-import me.ufo.collectors.collector.CollectionType;
-import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.item.CollectorItem;
+import me.ufo.collectors.util.Style;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.inventory.ItemStack;
 
-@CommandAlias("collectors|collector")
-@CommandPermission("venom.admin")
-public class CollectorsCommand extends BaseCommand {
+public class CollectorsCommand implements CommandExecutor {
 
-    @Dependency private CollectorsPlugin plugin;
+    private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
+        if (!sender.hasPermission("collectors.admin")) return false;
+
+        if (args.length == 0) {
+            sender.sendMessage(new String[] {
+                    Style.translate("&e/collector give <target> <amount> &7- &dGive collector to player.")
+            });
+        }
+
+        switch (args.length) {
+            case 2:
+            case 3:
+                if (args[0].equalsIgnoreCase("give")) {
+                    final Player target = plugin.getServer().getPlayer(args[1]);
+                    if (target == null) {
+                        sender.sendMessage(ChatColor.RED.toString() + "That player cannot be found.");
+                        return false;
+                    }
+
+                    int amount;
+                    try {
+                        amount = Integer.parseInt(args[2]);
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                        amount = 1;
+                    }
+
+                    target.getInventory().addItem(new ItemStack(CollectorItem.get(amount)));
+
+                    target.sendMessage(Style.translate("&dYou have been given " + amount + " collector(s)."));
+                }
+                break;
+        }
+
+        return false;
+    }
 
     // TEMPORARY DEBUG COMMANDS
 
-    @Subcommand("increment")
+    /*@Subcommand("increment")
     public void onCollectorsIncrementCommand(CommandSender sender) {
         Collector.getCollectorCache().forEach((k, collector) -> {
             collector.increment(CollectionType.CREEPER, 100);
@@ -89,6 +121,6 @@ public class CollectorsCommand extends BaseCommand {
         } else {
             player.sendMessage(ChatColor.RED.toString() + "There is no collector in this chunk.");
         }
-    }
+    }*/
 
 }
