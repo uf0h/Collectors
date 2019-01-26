@@ -3,12 +3,11 @@ package me.ufo.collectors.gui;
 import com.massivecraft.factions.entity.MPlayer;
 import lombok.Getter;
 import lombok.Setter;
-import me.aceix8.outposts.AceOutposts;
-import me.aceix8.outposts.api.OutpostAPI;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
+import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.util.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,9 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class CollectorGUI extends GUI {
-
-    private static final OutpostAPI OUTPOST_API = AceOutposts.getInstance().getApi();
-
 
     @Getter @Setter private Inventory inventory;
     private Collector collector;
@@ -82,7 +78,7 @@ public class CollectorGUI extends GUI {
 
                     double sellPrice = collectionType.getSellPrice();
 
-                    if (OUTPOST_API.isFactionControllingAnOutpost(MPlayer.get(player).getFaction())) {
+                    if (Outpost.isFactionControllingOutpost(MPlayer.get(player).getFaction())) {
                         sellPrice *= 2;
                     }
 

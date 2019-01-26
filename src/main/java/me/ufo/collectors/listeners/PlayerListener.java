@@ -3,12 +3,11 @@ package me.ufo.collectors.listeners;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.ps.PS;
-import me.aceix8.outposts.AceOutposts;
-import me.aceix8.outposts.api.OutpostAPI;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
+import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
 import org.bukkit.ChatColor;
@@ -22,8 +21,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class PlayerListener implements Listener {
-
-    private static final OutpostAPI OUTPOST_API = AceOutposts.getInstance().getApi();
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
@@ -132,7 +129,7 @@ public class PlayerListener implements Listener {
                                     return;
                                 }
 
-                                if (OUTPOST_API.isFactionControllingAnOutpost(MPlayer.get(event.getPlayer()).getFaction())) {
+                                if (Outpost.isFactionControllingOutpost(MPlayer.get(event.getPlayer()).getFaction())) {
                                     totalValue *= 2;
                                     event.getPlayer().sendMessage(ChatColor.RED.toString() + "You will receive " + ChatColor.GREEN.toString() + "x2" + ChatColor.RED.toString() + " value as you are controlling outpost.");
                                 }

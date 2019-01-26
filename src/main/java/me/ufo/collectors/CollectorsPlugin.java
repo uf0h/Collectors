@@ -11,6 +11,7 @@ import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
 import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
+import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.listeners.*;
 import me.ufo.collectors.tasks.CollectorSaveThread;
@@ -94,6 +95,7 @@ public class CollectorsPlugin extends JavaPlugin {
         new Econ().setup();
         new Factions().setup();
         new Worldguard().setup();
+        new Outpost().setup();
     }
 
     private void registerCommands(PaperCommandManager paperCommandManager, BaseCommand... baseCommands) {
