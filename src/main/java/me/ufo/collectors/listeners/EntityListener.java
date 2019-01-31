@@ -21,27 +21,39 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onBlockGrowEvent(BlockGrowEvent event) {
-        if (!blockCannotGrow(event.getBlock().getWorld(), event.getBlock())) {
-            if (event.getNewState().getType() == Material.CACTUS) {
-                event.setCancelled(true);
-                final Collector collector = Collector.get(event.getBlock().getLocation());
-                if (collector != null) {
-                    collector.increment(CollectionType.CACTUS);
+        try { // TEMP
+            if (event.getBlock() != null) {
+                if (!blockCannotGrow(event.getBlock().getWorld(), event.getBlock())) {
+                    if (event.getNewState().getType() == Material.CACTUS) {
+                        event.setCancelled(true);
+                        final Collector collector = Collector.get(event.getBlock().getLocation());
+                        if (collector != null) {
+                            collector.increment(CollectionType.CACTUS);
+                        }
+                    }
                 }
             }
-        }
+        } catch (Exception ignored) { }
     }
 
     @EventHandler
     public void onSpawnerPreSpawnEvent(SpawnerPreSpawnEvent event) {
-        final CollectionType collectionType = CollectionType.parse(event.getSpawnedType());
-        if (collectionType != null) {
-            event.setCancelled(true);
-            final Collector collector = Collector.get(event.getLocation());
-            if (collector != null) {
-                collector.increment(collectionType);
+        try { // TEMP
+            CollectionType collectionType = CollectionType.parse(event.getSpawnedType());
+            if (collectionType != null) {
+                event.setCancelled(true);
+                final Collector collector = Collector.get(event.getLocation());
+                if (collector != null) {
+                    if (collectionType == CollectionType.CAVE_SPIDER) collectionType = CollectionType.SPIDER;
+
+                    if (collectionType == CollectionType.CREEPER) {
+                        collector.increment(collectionType, 2);
+                    } else {
+                        collector.increment(collectionType);
+                    }
+                }
             }
-        }
+        } catch (Exception ignored) { }
     }
 
     private boolean blockCannotGrow(World world, Block block) {

@@ -4,6 +4,7 @@ import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.event.EventFactionsChunkChangeType;
 import com.massivecraft.factions.event.EventFactionsChunksChange;
 import com.massivecraft.factions.event.EventFactionsDisband;
+import com.massivecraft.factions.event.EventFactionsMembershipChange;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.Collector;
 import org.bukkit.ChatColor;
@@ -62,6 +63,17 @@ public class FactionListener implements Listener {
             event.setCancelled(true);
             event.getMPlayer().msg(ChatColor.RED.toString() + "You must remove all collectors in these claims before unclaiming.");
         });
+    }
+
+    @EventHandler
+    public void onFactionsMembershipChangeEvent(EventFactionsMembershipChange event) {
+        if (event.getReason() == EventFactionsMembershipChange.MembershipChangeReason.LEAVE && event.getMPlayer().getFaction().getMPlayers().size() == 1) {
+            BoardColl.get().getChunks(event.getMPlayer().getFaction()).stream().filter(ps ->
+                    Collector.chunkHasCollector(ps.asBukkitChunk().getWorld().getName(), ps.asBukkitChunk().getX(), ps.asBukkitChunk().getZ())).findAny().ifPresent(ps -> {
+                event.setCancelled(true);
+                event.getMPlayer().msg(ChatColor.RED.toString() + "You must remove all collectors in your claims before disbanding.");
+            });
+        }
     }
 
 }

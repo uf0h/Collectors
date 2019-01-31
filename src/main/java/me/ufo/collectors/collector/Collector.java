@@ -33,8 +33,10 @@ public class Collector {
     public Collector(Location location) {
         this.location = location;
 
-        for (CollectionType collectionType : CollectionType.values())
+        for (CollectionType collectionType : CollectionType.values()) {
+            if (collectionType == CollectionType.CAVE_SPIDER) continue;
             this.amounts.putIfAbsent(collectionType, 0);
+        }
     }
 
     public static void add(Location location) {
@@ -45,9 +47,9 @@ public class Collector {
         return collectorCache.get(serialize(location));
     }
 
-    /*public static Collector get(String world, int chunkX, int chunkZ) {
+    public static Collector get(String world, int chunkX, int chunkZ) {
         return collectorCache.get(serialize(world, chunkX, chunkZ));
-    }*/
+    }
 
     public void increment(CollectionType collectionType) {
         this.amounts.put(collectionType, this.amounts.get(collectionType) + 1);
@@ -147,6 +149,10 @@ public class Collector {
 
                 collectorCache.forEach((k, v) -> {
                     v.viewers = new HashSet<>();
+                    for (CollectionType collectionType : CollectionType.values()) {
+                        if (collectionType == CollectionType.CAVE_SPIDER) continue;
+                        v.amounts.putIfAbsent(collectionType, 0);
+                    }
                 });
 
                 plugin.getLogger().info("Collectors have been loaded into memory (" + collectorCache.size() + ").");

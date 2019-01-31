@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.util.NBTItem;
-import me.ufo.collectors.util.Skulls;
 import me.ufo.collectors.util.Style;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,13 +19,22 @@ public enum CollectionType {
     CACTUS(Material.CACTUS),
     SUGAR_CANE(Material.SUGAR_CANE),
 
+    CHICKEN(EntityType.CHICKEN),
+    //BLAZE(EntityType.BLAZE),
+    RABBIT(EntityType.RABBIT),
+    SPIDER(EntityType.SPIDER),
+    CAVE_SPIDER(EntityType.CAVE_SPIDER),
+    ZOMBIE(EntityType.ZOMBIE),
+    SKELETON(EntityType.SKELETON),
+
     CREEPER(EntityType.CREEPER),
     PIG(EntityType.PIG),
     COW(EntityType.COW),
     PIG_ZOMBIE(EntityType.PIG_ZOMBIE),
     ENDERMAN(EntityType.ENDERMAN),
     IRON_GOLEM(EntityType.IRON_GOLEM),
-    VILLAGER(EntityType.VILLAGER);
+    VILLAGER(EntityType.VILLAGER),
+    WITCH(EntityType.WITCH);
 
     @Getter private Material material;
     @Getter private EntityType entityType;
@@ -44,6 +52,7 @@ public enum CollectionType {
     public static boolean initialize(CollectorsPlugin plugin) {
         for (CollectionType collectionType : CollectionType.values()) {
             if (collectionType == CollectionType.CREEPER) continue;
+            if (collectionType == CollectionType.CAVE_SPIDER) continue;
             final String PATH = "collection-types." + collectionType + ".sell-price";
 
             if (plugin.getConfig().get(PATH) != null) {
@@ -80,7 +89,7 @@ public enum CollectionType {
         ItemStack itemStack;
 
         switch (this) {
-            case CACTUS:
+            /*case CACTUS:
                 itemStack = Skulls.Skull.CACTUS.get();
                 break;
             case SUGAR_CANE:
@@ -106,7 +115,7 @@ public enum CollectionType {
                 break;
             case VILLAGER:
                 itemStack = Skulls.Skull.VILLAGER.get();
-                break;
+                break;*/
             default:
                 itemStack = new ItemStack(material, 1, (short) durability);
                 break;

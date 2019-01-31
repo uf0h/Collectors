@@ -9,9 +9,11 @@ import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.util.NBTItem;
+import me.ufo.collectors.util.Style;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -23,11 +25,37 @@ public class CollectorGUI extends GUI {
     private Collector collector;
 
     public CollectorGUI(Collector collector) {
+        final FileConfiguration config = CollectorsPlugin.getInstance().getConfig();
+
         this.collector = collector;
-        this.inventory = Bukkit.createInventory(this, 45, ChatColor.DARK_GRAY.toString() + "Collector Menu");
+
+        int size = config.getInt("gui-size");
+
+        this.inventory = Bukkit.createInventory(this, size, ChatColor.DARK_GRAY.toString() + "Collector Menu");
+
+        ItemStack itemStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setDisplayName(" ");
+        itemStack.setItemMeta(itemMeta);
+
+        for (int i = 0; i < this.inventory.getSize(); i++) {
+            this.inventory.setItem(i, itemStack);
+        }
+
+        final String PATH = "info-item.";
+
+        ItemStack book = new ItemStack(Material.getMaterial(config.getString(PATH + "material")));
+        ItemMeta bookMeta = book.getItemMeta();
+        bookMeta.setDisplayName(Style.translate(config.getString(PATH + "name")));
+        bookMeta.setLore(Style.translateLines(config.getStringList(PATH + "lore")));
+        book.setItemMeta(bookMeta);
+
+        this.inventory.setItem(4, book);
 
         CollectorsPlugin.getInstance().getServer().getScheduler().runTask(CollectorsPlugin.getInstance(), () -> {
             for (CollectionType collectionType : CollectionType.values()) {
+                if (collectionType == CollectionType.CAVE_SPIDER) continue;
+
                 inventory.setItem(collectionType.getSlot(), collectionType.getItemStack(this.collector));
             }
 
@@ -38,6 +66,10 @@ public class CollectorGUI extends GUI {
             final ItemStack item = event.getCurrentItem();
 
             if (item == null || !item.hasItemMeta()) {
+                return;
+            }
+
+            if (item.getType() == Material.getMaterial(config.getString(PATH + "material"))) {
                 return;
             }
 

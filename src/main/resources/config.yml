@@ -1,9 +1,19 @@
 # Creeper has no sell price as it's function is to give TNT.
 
+gui-size: 45
+
 collector-item:
   name: "&b&lCollector"
   lore:
     - "&7Automatically collect certain drops in a chunk."
+
+info-item:
+  name: "&b&lINFO"
+  lore:
+    - "&7Collectors allow you to easily collect and sell"
+    - "&7a range of drops."
+  material: BOOK
+  durability: 0
 
 collection-types:
   CACTUS:
@@ -12,68 +22,119 @@ collection-types:
       - "&7You currently have &e%amount% &7available to sell."
     material: CACTUS
     durability: 0
-    gui-slot: 12
+    gui-slot: 11
     sell-price: 1.0
   SUGAR_CANE:
     name: "&eSugarcane"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
-    material: MONSTER_EGG
-    durability: 50
-    gui-slot: 13
+    material: SUGAR_CANE
+    durability: 0
+    gui-slot: 20
     sell-price: 12.5
   CREEPER:
     name: "&eTNT"
     lore:
       - "&7You currently have &e%amount% &7available to withdraw."
+    material: TNT
+    durability: 0
+    gui-slot: 29
+
+  RABBIT:
+    name: "&eRabbit"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
     material: MONSTER_EGG
-    durability: 50
-    gui-slot: 14
+    durability: 101
+    gui-slot: 12
+    sell-price: 0.5
+  CHICKEN:
+    name: "&eChicken"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 93
+    gui-slot: 13
+    sell-price: 1.0
   PIG:
     name: "&ePig"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
-    material: DIAMOND_SWORD
-    durability: 0
+    material: MONSTER_EGG
+    durability: 90
+    gui-slot: 14
+    sell-price: 1.0
+  ZOMBIE:
+    name: "&eZombie"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 54
+    gui-slot: 15
+    sell-price: 2.0
+
+  SKELETON:
+    name: "&eSkeleton"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 51
     gui-slot: 21
-    sell-price: 0.5
+    sell-price: 2.0
+  SPIDER:
+    name: "&eSpider"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 52
+    gui-slot: 22
+    sell-price: 2.0
   COW:
     name: "&eCow"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
-    material: DIAMOND_SWORD
-    durability: 0
-    gui-slot: 22
-    sell-price: 3.0
-  PIG_ZOMBIE:
-    name: "&eZombie Pigmen"
-    lore:
-      - "&7You currently have &e%amount% &7available to sell."
-    material: DIAMOND_SWORD
-    durability: 0
+    material: MONSTER_EGG
+    durability: 92
     gui-slot: 23
-    sell-price: 13.5
+    sell-price: 4.0
   ENDERMAN:
     name: "&eEndermen"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
-    material: DIAMOND_SWORD
-    durability: 0
-    gui-slot: 30
+    material: MONSTER_EGG
+    durability: 58
+    gui-slot: 24
     sell-price: 11.0
-  IRON_GOLEM:
-    name: "&eIron Golem"
+
+  PIG_ZOMBIE:
+    name: "&eZombie Pigmen"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
-    material: DIAMOND_SWORD
-    durability: 0
-    gui-slot: 31
-    sell-price: 75.0
+    material: MONSTER_EGG
+    durability: 57
+    gui-slot: 30
+    sell-price: 13.5
   VILLAGER:
     name: "&eVillager"
     lore:
       - "&7You currently have &e%amount% &7available to sell."
-    material: DIAMOND_SWORD
-    durability: 0
-    gui-slot: 32
+    material: MONSTER_EGG
+    durability: 120
+    gui-slot: 31
     sell-price: 35.0
+  WITCH:
+    name: "&eWitch"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 66
+    gui-slot: 32
+    sell-price: 54.0
+  IRON_GOLEM:
+    name: "&eIron Golem"
+    lore:
+      - "&7You currently have &e%amount% &7available to sell."
+    material: MONSTER_EGG
+    durability: 91
+    gui-slot: 33
+    sell-price: 75.0
