@@ -5,6 +5,7 @@ import lombok.Setter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.util.NBTItem;
 import me.ufo.collectors.util.Style;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -131,8 +132,8 @@ public enum CollectionType {
 
     public List<String> getLore(Collector collector) {
         return Style.translateLines(this.config.getStringList(PATH + "lore").stream().map(s ->
-            s.replace("%amount%", String.valueOf(collector.getAmountOfCollectionType(this))))
-                .collect(Collectors.toList()));
+                StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this))))
+            .collect(Collectors.toList()));
     }
 
     public int getSlot() {
