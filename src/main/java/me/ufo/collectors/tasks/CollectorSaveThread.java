@@ -21,6 +21,7 @@ public class CollectorSaveThread extends Thread {
                 Thread.sleep(2 * 60000L); // every 2mins for testing purposes
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
