@@ -12,6 +12,7 @@ import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -118,14 +119,17 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onEntityExplodeEvent(EntityExplodeEvent event) {
-        event.blockList().stream().filter(block -> block.getType() == Material.BEACON).forEach(block -> {
-            if (Collector.chunkHasCollector(block.getLocation())) {
-                if (Collector.isCollector(block.getLocation())) {
-                    Collector.get(block.getLocation()).remove(true);
-                    block.getWorld().dropItem(block.getLocation(), CollectorItem.get());
+        for (int i = 0; i < event.blockList().size(); i++) {
+            if (event.blockList().get(i).getType() != Material.BEACON) continue;
+
+            final Location location = event.blockList().get(i).getLocation();
+            if (Collector.chunkHasCollector(location)) {
+                if (Collector.isCollector(location)) {
+                    Collector.get(location).remove(true);
+                    location.getWorld().dropItem(location, CollectorItem.get());
                 }
             }
-        });
+        }
     }
 
     @EventHandler
