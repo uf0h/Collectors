@@ -1,5 +1,8 @@
 package me.ufo.collectors;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -15,13 +18,9 @@ import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.listeners.*;
 import me.ufo.collectors.tasks.CollectorSaveThread;
-import me.ufo.collectors.util.Skulls;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.io.IOException;
 
 @Getter
 public class CollectorsPlugin extends JavaPlugin {
@@ -68,8 +67,6 @@ public class CollectorsPlugin extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
         }
 
-        this.initializeUtilities();
-
         this.getCommand("collectors").setExecutor(new CollectorsCommand());
 
         this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener(), new FactionListener());
@@ -105,10 +102,6 @@ public class CollectorsPlugin extends JavaPlugin {
         for (Listener listener : listeners) {
             this.getServer().getPluginManager().registerEvents(listener, this);
         }
-    }
-
-    private void initializeUtilities() {
-        new Skulls().loadSkullsIntoCache();
     }
 
     public void disableCollectorSaveThread() {
