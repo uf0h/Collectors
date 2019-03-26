@@ -104,28 +104,6 @@ public class CollectorsCommand implements CommandExecutor {
                 }
 
                 break;
-
-            case 4:
-                if (args[0].equalsIgnoreCase("give")) {
-                    final Player target = plugin.getServer().getPlayer(args[1]);
-                    if (target == null) {
-                        sender.sendMessage(ChatColor.RED.toString() + "That player cannot be found.");
-                        return false;
-                    }
-
-                    int amount;
-                    try {
-                        amount = Integer.parseInt(args[3]);
-                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                        amount = 1;
-                    }
-
-                    target.getInventory().addItem(new ItemStack(CollectorItem.get(amount)));
-
-                    target.sendMessage(Style.translate("&dYou have been given " + amount + " collector(s)."));
-                    return false;
-                }
-                break;
         }
 
         return false;
