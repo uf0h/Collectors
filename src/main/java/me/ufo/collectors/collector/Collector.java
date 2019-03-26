@@ -168,8 +168,7 @@ public class Collector {
     private static CompletableFuture<ConcurrentHashMap<String, Collector>> load() {
         return CompletableFuture.supplyAsync(() -> {
             try (FileReader reader = new FileReader(CollectorsPlugin.getInstance().getDataFolder().toString() + "/data.json")) {
-                return CollectorsPlugin.getInstance().getGson().fromJson(reader, new TypeToken<ConcurrentHashMap<String, Collector>>() {
-                }.getType());
+                return CollectorsPlugin.getInstance().getGson().fromJson(reader, new TypeToken<ConcurrentHashMap<String, Collector>>() {}.getType());
             } catch (IOException e) {
                 CollectorsPlugin.getInstance().getLogger().warning("Failed to load collectors.");
                 return null;
