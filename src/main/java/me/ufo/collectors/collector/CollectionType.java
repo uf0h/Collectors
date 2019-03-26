@@ -87,41 +87,7 @@ public enum CollectionType {
         Material material = Material.getMaterial(config.getString(PATH + "material"));
         int durability = config.getInt(PATH + "durability");
 
-        ItemStack itemStack;
-
-        switch (this) {
-            /*case CACTUS:
-                itemStack = Skulls.Skull.CACTUS.get();
-                break;
-            case SUGAR_CANE:
-                itemStack = Skulls.Skull.SUGARCANE.get();
-                break;
-            case CREEPER:
-                itemStack = Skulls.Skull.TNT.get();
-                break;
-            case PIG:
-                itemStack = Skulls.Skull.PIG.get();
-                break;
-            case COW:
-                itemStack = Skulls.Skull.COW.get();
-                break;
-            case PIG_ZOMBIE:
-                itemStack = Skulls.Skull.ZOMBIE_PIGMAN.get();
-                break;
-            case ENDERMAN:
-                itemStack = Skulls.Skull.ENDERMAN.get();
-                break;
-            case IRON_GOLEM:
-                itemStack = Skulls.Skull.GOLEM.get();
-                break;
-            case VILLAGER:
-                itemStack = Skulls.Skull.VILLAGER.get();
-                break;*/
-            default:
-                itemStack = new ItemStack(material, 1, (short) durability);
-                break;
-        }
-
+        ItemStack itemStack = new ItemStack(material, 1, (short) durability);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName(name);
         itemMeta.setLore(this.getLore(collector));

@@ -85,43 +85,40 @@ public class CollectorGUI extends GUI {
             final CollectionType collectionType = CollectionType.valueOf(nbtItem.getString("CollectionItem"));
             final Player player = (Player) event.getWhoClicked();
 
-            switch (collectionType) {
-                case CREEPER:
-                    if (this.collector.getAmountOfCollectionType(collectionType) == 0) {
-                        player.sendMessage(ChatColor.RED.toString() + "There is no TNT to withdraw.");
-                        return;
-                    }
+            if (collectionType == CollectionType.CREEPER) {
+                if (this.collector.getAmountOfCollectionType(collectionType) == 0) {
+                    player.sendMessage(ChatColor.RED.toString() + "There is no TNT to withdraw.");
+                    return;
+                }
 
-                    if (player.getInventory().firstEmpty() == -1) {
-                        player.sendMessage(ChatColor.RED.toString() + "You cannot withdraw anymore TNT with a full inventory.");
-                        return;
-                    }
+                if (player.getInventory().firstEmpty() == -1) {
+                    player.sendMessage(ChatColor.RED.toString() + "You cannot withdraw anymore TNT with a full inventory.");
+                    return;
+                }
 
-                    final int tntToBeGiven = (this.collector.getAmountOfCollectionType(collectionType) > 64 ? 64 : this.collector.getAmountOfCollectionType(collectionType));
-                    player.getInventory().addItem(new ItemStack(Material.TNT, tntToBeGiven));
+                final int tntToBeGiven = (this.collector.getAmountOfCollectionType(collectionType) > 64 ? 64 : this.collector.getAmountOfCollectionType(collectionType));
+                player.getInventory().addItem(new ItemStack(Material.TNT, tntToBeGiven));
 
-                    this.collector.decrement(collectionType, tntToBeGiven);
-                    break;
-                default:
-                    if (this.collector.getAmountOfCollectionType(collectionType) < 100) {
-                        player.sendMessage(ChatColor.RED.toString() + "There must be at least 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + " to sell.");
-                        return;
-                    }
+                this.collector.decrement(collectionType, tntToBeGiven);
+            } else {
+                if (this.collector.getAmountOfCollectionType(collectionType) < 100) {
+                    player.sendMessage(ChatColor.RED.toString() + "There must be at least 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + " to sell.");
+                    return;
+                }
 
-                    double sellPrice = collectionType.getSellPrice();
+                double sellPrice = collectionType.getSellPrice();
 
-                    if (Outpost.isFactionControllingOutpost(MPlayer.get(player).getFaction())) {
-                        sellPrice *= 2;
-                    }
+                if (Outpost.isFactionControllingOutpost(MPlayer.get(player).getFaction())) {
+                    sellPrice *= 2;
+                }
 
-                    if (Econ.depositAmountToPlayer(player, (100 * sellPrice))) {
-                        this.collector.decrement(collectionType, 100);
-                        player.sendMessage(ChatColor.GREEN.toString() + "+$" + (100 * sellPrice) + ChatColor.RED.toString() + " from selling 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
-                    } else {
-                        player.sendMessage(ChatColor.RED.toString() + "Error: Unable to sell 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
-                        return;
-                    }
-                    break;
+                if (Econ.depositAmountToPlayer(player, (100 * sellPrice))) {
+                    this.collector.decrement(collectionType, 100);
+                    player.sendMessage(ChatColor.GREEN.toString() + "+$" + (100 * sellPrice) + ChatColor.RED.toString() + " from selling 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
+                } else {
+                    player.sendMessage(ChatColor.RED.toString() + "Error: Unable to sell 100 " + ChatColor.YELLOW.toString() + collectionType.toString() + ChatColor.RED.toString() + ".");
+                    return;
+                }
             }
 
             this.update(collectionType);
