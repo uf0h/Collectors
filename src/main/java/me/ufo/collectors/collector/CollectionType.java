@@ -43,6 +43,7 @@ public enum CollectionType {
   @Getter private Material material;
   @Getter private EntityType entityType;
   @Getter @Setter private double sellPrice;
+  @Setter private List<String> lore;
 
   CollectionType(Material material) {
     this.material = material;
@@ -57,10 +58,11 @@ public enum CollectionType {
     for (CollectionType collectionType : CollectionType.values()) {
       if (collectionType == CollectionType.CREEPER) continue;
       if (collectionType == CollectionType.CAVE_SPIDER) continue;
-      final String PATH = "collection-types." + collectionType + ".sell-price";
+      final String PATH = "collection-types." + collectionType + ".";
 
       if (plugin.getConfig().get(PATH) != null) {
-        collectionType.setSellPrice(plugin.getConfig().getDouble(PATH));
+        collectionType.setSellPrice(plugin.getConfig().getDouble(PATH + "sell-price"));
+        collectionType.setLore(Style.translate(plugin.getConfig().getStringList(PATH + "lore")));
       } else {
         return false;
       }
@@ -97,8 +99,8 @@ public enum CollectionType {
   }
 
   public List<String> getLore(Collector collector) {
-    return Style.translate(this.config.getStringList(PATH + "lore").stream().map(s ->
-        StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this)))).collect(Collectors.toList()));
+    return this.lore.stream().map(s ->
+        StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this)))).collect(Collectors.toList());
   }
 
   public int getSlot() {
