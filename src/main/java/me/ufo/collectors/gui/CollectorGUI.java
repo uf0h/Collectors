@@ -49,7 +49,7 @@ public class CollectorGUI extends GUI {
     ItemStack book = new ItemStack(Material.getMaterial(config.getString(PATH + "material")));
     ItemMeta bookMeta = book.getItemMeta();
     bookMeta.setDisplayName(Style.translate(config.getString(PATH + "name")));
-    bookMeta.setLore(Style.translateLines(config.getStringList(PATH + "lore")));
+    bookMeta.setLore(Style.translate(config.getStringList(PATH + "lore")));
     book.setItemMeta(bookMeta);
 
     this.inventory.setItem(4, book);

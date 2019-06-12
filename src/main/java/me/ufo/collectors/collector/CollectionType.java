@@ -100,7 +100,7 @@ public enum CollectionType {
   }
 
   public List<String> getLore(Collector collector) {
-    return Style.translateLines(this.config.getStringList(PATH + "lore").stream().map(s ->
+    return Style.translate(this.config.getStringList(PATH + "lore").stream().map(s ->
         StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this))))
         .collect(Collectors.toList()));
   }
