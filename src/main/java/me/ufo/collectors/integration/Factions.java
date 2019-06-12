@@ -9,23 +9,23 @@ import org.bukkit.entity.Player;
 
 public class Factions {
 
-    private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
+  private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
 
-    public static boolean playerCanPlaceHere(Player player, Block block) {
-        return EnginePermBuild.canPlayerBuildAt(player, PS.valueOf(block), true);
-    }
+  public static boolean playerCanPlaceHere(Player player, Block block) {
+    return EnginePermBuild.canPlayerBuildAt(player, PS.valueOf(block), true);
+  }
 
-    public void setup() {
-        if (!setupFactions()) {
-            this.plugin.getLogger().info("FACTIONS DEPENDENCY NOT FOUND.");
-            this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
-        } else {
-            this.plugin.getLogger().info("FACTIONS DEPENDENCY FOUND.");
-        }
+  public void setup() {
+    if (!setupFactions()) {
+      this.plugin.getLogger().info("FACTIONS DEPENDENCY NOT FOUND.");
+      this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
+    } else {
+      this.plugin.getLogger().info("FACTIONS DEPENDENCY FOUND.");
     }
+  }
 
-    private boolean setupFactions() {
-        return Bukkit.getServer().getPluginManager().getPlugin("Factions") != null;
-    }
+  private boolean setupFactions() {
+    return Bukkit.getServer().getPluginManager().getPlugin("Factions") != null;
+  }
 
 }

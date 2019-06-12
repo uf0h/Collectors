@@ -25,91 +25,92 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class CollectorsPlugin extends JavaPlugin {
 
-    @Getter private static CollectorsPlugin instance;
+  @Getter
+  private static CollectorsPlugin instance;
 
-    private FastBlockUpdate fastBlockUpdate;
+  private FastBlockUpdate fastBlockUpdate;
 
-    private Gson gson;
+  private Gson gson;
 
-    private CollectorSaveThread collectorSaveThread;
+  private CollectorSaveThread collectorSaveThread;
 
-    public CollectorsPlugin() {
-        this.saveDefaultConfig();
-        File dataFile = new File(this.getDataFolder() + "/data.json");
-        if (!dataFile.exists()) {
-            try {
-                dataFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+  public CollectorsPlugin() {
+    this.saveDefaultConfig();
+    File dataFile = new File(this.getDataFolder() + "/data.json");
+    if (!dataFile.exists()) {
+      try {
+        dataFile.createNewFile();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  @Override
+  public void onEnable() {
+    long startTime = System.currentTimeMillis();
+
+    instance = this;
+
+    this.registerDependencies();
+
+    this.gson = new GsonBuilder()
+        .registerTypeAdapter(Location.class, new LocationTypeAdapter())
+        .disableHtmlEscaping().setPrettyPrinting().create();
+
+    if (!Collector.initialize(this)) {
+      this.getLogger().warning("Collectors have failed to be loaded into memory.");
+      this.getServer().getPluginManager().disablePlugin(this);
     }
 
-    @Override
-    public void onEnable() {
-        long startTime = System.currentTimeMillis();
-
-        instance = this;
-
-        this.registerDependencies();
-
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(Location.class, new LocationTypeAdapter())
-                    .disableHtmlEscaping().setPrettyPrinting().create();
-
-        if (!Collector.initialize(this)) {
-            this.getLogger().warning("Collectors have failed to be loaded into memory.");
-            this.getServer().getPluginManager().disablePlugin(this);
-        }
-
-        if (!CollectionType.initialize(this)) {
-            this.getLogger().warning("Collector prices have failed to register.");
-            this.getServer().getPluginManager().disablePlugin(this);
-        }
-
-        this.getCommand("collectors").setExecutor(new CollectorsCommand());
-
-        this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener(), new FactionListener());
-
-        this.fastBlockUpdate = new FastBlockUpdate_1_8_R3();
-
-        this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
-
-        this.collectorSaveThread = new CollectorSaveThread();
-
-        this.getServer().getScheduler().runTaskLater(this, () -> this.collectorSaveThread.start(), 100L);
+    if (!CollectionType.initialize(this)) {
+      this.getLogger().warning("Collector prices have failed to register.");
+      this.getServer().getPluginManager().disablePlugin(this);
     }
 
-    @Override
-    public void onDisable() {
-        Collector.getCollectorCache().forEach((s, collector) -> {
-            collector.getViewers().forEach(uuid -> this.getServer().getPlayer(uuid).closeInventory());
-        });
+    this.getCommand("collectors").setExecutor(new CollectorsCommand());
 
-        this.disableCollectorSaveThread();
+    this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener(), new FactionListener());
 
-        Collector.saveall();
+    this.fastBlockUpdate = new FastBlockUpdate_1_8_R3();
+
+    this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
+
+    this.collectorSaveThread = new CollectorSaveThread();
+
+    this.getServer().getScheduler().runTaskLater(this, () -> this.collectorSaveThread.start(), 100L);
+  }
+
+  @Override
+  public void onDisable() {
+    Collector.getCollectorCache().forEach((s, collector) -> {
+      collector.getViewers().forEach(uuid -> this.getServer().getPlayer(uuid).closeInventory());
+    });
+
+    this.disableCollectorSaveThread();
+
+    Collector.saveall();
+  }
+
+  private void registerDependencies() {
+    new Econ().setup();
+    new Factions().setup();
+    new Worldguard().setup();
+    new Outpost().setup();
+  }
+
+  private void registerListeners(Listener... listeners) {
+    for (Listener listener : listeners) {
+      this.getServer().getPluginManager().registerEvents(listener, this);
     }
+  }
 
-    private void registerDependencies() {
-        new Econ().setup();
-        new Factions().setup();
-        new Worldguard().setup();
-        new Outpost().setup();
+  public void disableCollectorSaveThread() {
+    if (this.collectorSaveThread != null) {
+      this.collectorSaveThread.interrupt();
+      this.collectorSaveThread.stop();
+      this.collectorSaveThread = null;
     }
-
-    private void registerListeners(Listener... listeners) {
-        for (Listener listener : listeners) {
-            this.getServer().getPluginManager().registerEvents(listener, this);
-        }
-    }
-
-    public void disableCollectorSaveThread() {
-        if (this.collectorSaveThread != null) {
-            this.collectorSaveThread.interrupt();
-            this.collectorSaveThread.stop();
-            this.collectorSaveThread = null;
-        }
-    }
+  }
 
 }

@@ -9,39 +9,38 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class Econ {
 
-    private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
+  public static Economy econ = null;
+  private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
 
-    public static Economy econ = null;
+  public static boolean withdrawAmountFromPlayer(Player player, double cost) {
+    EconomyResponse er = econ.withdrawPlayer(player, cost);
+    return er.transactionSuccess();
+  }
 
-    public static boolean withdrawAmountFromPlayer(Player player, double cost) {
-        EconomyResponse er = econ.withdrawPlayer(player, cost);
-        return er.transactionSuccess();
+  public static boolean depositAmountToPlayer(Player player, double amount) {
+    EconomyResponse er = econ.depositPlayer(player, amount);
+    return er.transactionSuccess();
+  }
+
+  public void setup() {
+    if (!setupEconomy()) {
+      this.plugin.getLogger().info("VAULT DEPENDENCY NOT FOUND.");
+      this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
+    } else {
+      this.plugin.getLogger().info("VAULT DEPENDENCY FOUND.");
     }
+  }
 
-    public static boolean depositAmountToPlayer(Player player, double amount) {
-        EconomyResponse er = econ.depositPlayer(player, amount);
-        return er.transactionSuccess();
+  private boolean setupEconomy() {
+    if (Bukkit.getServer().getPluginManager().getPlugin("Vault") == null) {
+      return false;
     }
-
-    public void setup() {
-        if (!setupEconomy()) {
-            this.plugin.getLogger().info("VAULT DEPENDENCY NOT FOUND.");
-            this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
-        } else {
-            this.plugin.getLogger().info("VAULT DEPENDENCY FOUND.");
-        }
+    RegisteredServiceProvider<Economy> rsp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
+    if (rsp == null) {
+      return false;
     }
-
-    private boolean setupEconomy() {
-        if (Bukkit.getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
-        RegisteredServiceProvider<Economy> rsp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        econ = rsp.getProvider();
-        return econ != null;
-    }
+    econ = rsp.getProvider();
+    return econ != null;
+  }
 
 }
