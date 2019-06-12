@@ -1,14 +1,5 @@
 package me.ufo.collectors.collector;
 
-import com.google.gson.reflect.TypeToken;
-import lombok.Data;
-import lombok.Getter;
-import me.ufo.collectors.CollectorsPlugin;
-import me.ufo.collectors.gui.CollectorGUI;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,6 +9,15 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.google.gson.reflect.TypeToken;
+import lombok.Data;
+import lombok.Getter;
+import me.ufo.collectors.CollectorsPlugin;
+import me.ufo.collectors.gui.CollectorGUI;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 @Data
 public class Collector {
@@ -122,11 +122,11 @@ public class Collector {
         return this.amounts.get(collectionType);
     }
 
-    public static String serialize(String world, int chunkX, int chunkZ) {
+    private static String serialize(String world, int chunkX, int chunkZ) {
         return world + "::" + chunkX + "::" + chunkZ;
     }
 
-    public static String serialize(Location location) {
+    private static String serialize(Location location) {
         return location.getWorld().getName() + "::" + location.getChunk().getX() + "::" + location.getChunk().getZ();
     }
 
