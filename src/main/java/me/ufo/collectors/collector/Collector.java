@@ -123,21 +123,11 @@ public class Collector {
     }
 
     public static String serialize(String world, int chunkX, int chunkZ) {
-        return new StringBuilder()
-                .append(world)
-                .append("::")
-                .append(chunkX)
-                .append("::")
-                .append(chunkZ).toString();
+        return world + "::" + chunkX + "::" + chunkZ;
     }
 
     public static String serialize(Location location) {
-        return new StringBuilder()
-                .append(location.getWorld().getName())
-                .append("::")
-                .append(location.getChunk().getX())
-                .append("::")
-                .append(location.getChunk().getZ()).toString();
+        return location.getWorld().getName() + "::" + location.getChunk().getX() + "::" + location.getChunk().getZ();
     }
 
     public static boolean initialize(CollectorsPlugin plugin) {
