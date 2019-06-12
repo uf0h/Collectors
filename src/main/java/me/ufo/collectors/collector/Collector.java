@@ -22,7 +22,8 @@ import org.bukkit.entity.Player;
 @Data
 public class Collector {
 
-  @Getter public static ConcurrentHashMap<String, Collector> collectorCache = new ConcurrentHashMap<>();
+  @Getter
+  public static ConcurrentHashMap<String, Collector> collectorCache = new ConcurrentHashMap<>();
 
   private ConcurrentHashMap<CollectionType, Integer> amounts = new ConcurrentHashMap<>();
   private Location location;
@@ -124,16 +125,11 @@ public class Collector {
 
   public static void saveall() {
     if (collectorCache.isEmpty()) return;
-
-    CompletableFuture.supplyAsync(() -> {
-      try (FileWriter writer = new FileWriter(CollectorsPlugin.getInstance().getDataFolder().toString() + "/data.json")) {
-        CollectorsPlugin.getInstance().getGson().toJson(collectorCache, writer);
-        return true;
-      } catch (IOException e) {
-        CollectorsPlugin.getInstance().getLogger().warning("Failed to save collectors.");
-        return false;
-      }
-    });
+    try (FileWriter writer = new FileWriter(CollectorsPlugin.getInstance().getDataFolder().toString() + "/data.json")) {
+      CollectorsPlugin.getInstance().getGson().toJson(collectorCache, writer);
+    } catch (IOException e) {
+      CollectorsPlugin.getInstance().getLogger().warning("Failed to save collectors.");
+    }
   }
 
   public void increment(CollectionType collectionType) {
@@ -179,6 +175,10 @@ public class Collector {
 
   public int getAmountOfCollectionType(CollectionType collectionType) {
     return this.amounts.get(collectionType);
+  }
+
+  public void disable() {
+    this.getViewers().forEach(viewer -> CollectorsPlugin.getInstance().getServer().getPlayer(viewer).closeInventory());
   }
 
 }

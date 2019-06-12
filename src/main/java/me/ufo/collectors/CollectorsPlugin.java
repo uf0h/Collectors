@@ -17,7 +17,7 @@ import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.listeners.*;
-import me.ufo.collectors.tasks.CollectorSaveThread;
+import me.ufo.collectors.tasks.CollectorSaveTask;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,7 +31,7 @@ public class CollectorsPlugin extends JavaPlugin {
 
   private Gson gson;
 
-  private CollectorSaveThread collectorSaveThread;
+  private CollectorSaveTask collectorSaveTask;
 
   public CollectorsPlugin() {
     this.saveDefaultConfig();
@@ -75,19 +75,13 @@ public class CollectorsPlugin extends JavaPlugin {
 
     this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
-    this.collectorSaveThread = new CollectorSaveThread();
-
-    this.getServer().getScheduler().runTaskLater(this, () -> this.collectorSaveThread.start(), 100L);
+    this.collectorSaveTask = new CollectorSaveTask();
+    this.collectorSaveTask.runTaskTimerAsynchronously(this, 100L, 1200L);
   }
 
   @Override
   public void onDisable() {
-    Collector.getCollectorCache().forEach((s, collector) -> {
-      collector.getViewers().forEach(uuid -> this.getServer().getPlayer(uuid).closeInventory());
-    });
-
-    this.disableCollectorSaveThread();
-
+    Collector.getCollectorCache().forEach((s, collector) -> collector.disable());
     Collector.saveall();
   }
 
@@ -101,14 +95,6 @@ public class CollectorsPlugin extends JavaPlugin {
   private void registerListeners(Listener... listeners) {
     for (Listener listener : listeners) {
       this.getServer().getPluginManager().registerEvents(listener, this);
-    }
-  }
-
-  public void disableCollectorSaveThread() {
-    if (this.collectorSaveThread != null) {
-      this.collectorSaveThread.interrupt();
-      this.collectorSaveThread.stop();
-      this.collectorSaveThread = null;
     }
   }
 
