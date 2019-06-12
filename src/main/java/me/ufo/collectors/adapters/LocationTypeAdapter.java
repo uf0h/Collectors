@@ -1,35 +1,47 @@
 package me.ufo.collectors.adapters;
 
-import com.google.gson.*;
-import org.bukkit.Bukkit;
+import java.io.IOException;
+
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+import me.ufo.collectors.CollectorsPlugin;
 import org.bukkit.Location;
+import org.bukkit.World;
 
-import java.lang.reflect.Type;
-
-public class LocationTypeAdapter implements JsonSerializer<Location>, JsonDeserializer<Location> {
+public class LocationTypeAdapter extends TypeAdapter<Location> {
 
     @Override
-    public JsonElement serialize(Location location, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject object = new JsonObject();
-        try {
-            object.add("x", new JsonPrimitive(location.getX()));
-            object.add("y", new JsonPrimitive(location.getY()));
-            object.add("z", new JsonPrimitive(location.getZ()));
-            object.add("world", new JsonPrimitive(location.getWorld().getName()));
-            return object;
-        } catch (Exception e) {
-            return null;
+    public void write(JsonWriter writer, Location location) throws IOException {
+        if (location != null && location.getWorld() != null) {
+            writer.beginArray();
+            writer.value(location.getWorld().getName());
+            writer.value(location.getX());
+            writer.value(location.getY());
+            writer.value(location.getZ());
+            writer.value(location.getYaw());
+            writer.value(location.getPitch());
+            writer.endArray();
+            return;
         }
+
+        writer.nullValue();
     }
 
     @Override
-    public Location deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
-        JsonObject object = jsonElement.getAsJsonObject();
-        try {
-            return new Location(Bukkit.getWorld(object.get("world").getAsString()), object.get("x").getAsDouble(), object.get("y").getAsDouble(), object.get("z").getAsDouble());
-        } catch (Exception e) {
-            return null;
+    public Location read(JsonReader reader) throws IOException {
+        if (reader.peek() != JsonToken.NULL) {
+            reader.beginArray();
+            final World world = CollectorsPlugin.getInstance().getServer().getWorld(reader.nextString());
+            final double x = reader.nextDouble(), y = reader.nextDouble(), z = reader.nextDouble();
+            final float yaw = (float) reader.nextDouble(), pitch = (float) reader.nextDouble();
+            reader.endArray();
+            return new Location(world, x, y, z, yaw, pitch);
         }
+
+        reader.nextNull();
+        return null;
     }
 
 }
