@@ -16,7 +16,10 @@ import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
-import me.ufo.collectors.listeners.*;
+import me.ufo.collectors.listeners.EntityListener;
+import me.ufo.collectors.listeners.FactionListener;
+import me.ufo.collectors.listeners.InventoryListener;
+import me.ufo.collectors.listeners.PlayerListener;
 import me.ufo.collectors.tasks.CollectorSaveTask;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
@@ -25,7 +28,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class CollectorsPlugin extends JavaPlugin {
 
-  @Getter private static CollectorsPlugin instance;
+  @Getter
+  private static CollectorsPlugin instance;
 
   private FastBlockUpdate fastBlockUpdate;
 
@@ -69,7 +73,7 @@ public class CollectorsPlugin extends JavaPlugin {
 
     this.getCommand("collectors").setExecutor(new CollectorsCommand());
 
-    this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new ShutdownListener(), new FactionListener());
+    this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new FactionListener());
 
     this.fastBlockUpdate = new FastBlockUpdate_1_8_R3();
 
