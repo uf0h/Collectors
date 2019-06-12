@@ -22,8 +22,7 @@ import org.bukkit.entity.Player;
 @Data
 public class Collector {
 
-  @Getter
-  public static ConcurrentHashMap<String, Collector> collectorCache = new ConcurrentHashMap<>();
+  @Getter public static ConcurrentHashMap<String, Collector> collectorCache = new ConcurrentHashMap<>();
 
   private ConcurrentHashMap<CollectionType, Integer> amounts = new ConcurrentHashMap<>();
   private Location location;

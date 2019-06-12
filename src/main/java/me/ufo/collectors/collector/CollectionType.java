@@ -39,13 +39,10 @@ public enum CollectionType {
 
   private final FileConfiguration config = CollectorsPlugin.getInstance().getConfig();
   private final String PATH = "collection-types." + this + ".";
-  @Getter
-  private Material material;
-  @Getter
-  private EntityType entityType;
-  @Getter
-  @Setter
-  private double sellPrice;
+
+  @Getter private Material material;
+  @Getter private EntityType entityType;
+  @Getter @Setter private double sellPrice;
 
   CollectionType(Material material) {
     this.material = material;
@@ -101,8 +98,7 @@ public enum CollectionType {
 
   public List<String> getLore(Collector collector) {
     return Style.translate(this.config.getStringList(PATH + "lore").stream().map(s ->
-        StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this))))
-        .collect(Collectors.toList()));
+        StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this)))).collect(Collectors.toList()));
   }
 
   public int getSlot() {
