@@ -107,7 +107,7 @@ public class PlayerListener implements Listener {
 
         Block next = event.getBlock();
         while (next != null && next.getType() == Material.SUGAR_CANE_BLOCK) {
-          CollectorsPlugin.getInstance().getFastBlockUpdate().run(next.getLocation(), Material.AIR, false);
+          this.removeBlockAt(next.getLocation());
           amountOfCane += 1;
           next = next.getRelative(BlockFace.UP);
         }
