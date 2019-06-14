@@ -10,9 +10,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 public abstract class GUI implements InventoryHolder {
 
-  @Getter
-  @Setter
-  private Consumer<InventoryClickEvent> consumer;
+  @Getter @Setter private Consumer<InventoryClickEvent> consumer;
 
   public abstract Inventory getInventory();
 

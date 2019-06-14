@@ -21,9 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CollectorGUI extends GUI {
 
-  @Getter
-  @Setter
-  private Inventory inventory;
+  @Getter @Setter private Inventory inventory;
   private Collector collector;
 
   public CollectorGUI(Collector collector) {
