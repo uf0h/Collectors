@@ -32,7 +32,7 @@ public class PlayerListener implements Listener {
 
     if (event.getBlockPlaced().getType() == Material.BEACON) {
       if (event.getItemInHand() != null) {
-        if (this.isCollectorItem(event.getItemInHand())) {
+        if (CollectorItem.is(event.getItemInHand())) {
 
           if (!Factions.playerCanPlaceHere(event.getPlayer(), event.getBlock()) ||
               !Worldguard.playerCanPlaceHere(event.getPlayer(), event.getBlock())) {
@@ -186,12 +186,8 @@ public class PlayerListener implements Listener {
     }
   }
 
-  private boolean isCollectorItem(ItemStack itemStack) {
-    if (itemStack == null || !itemStack.hasItemMeta()) return false;
-    ItemStack collectorItem = CollectorItem.get();
-    if (itemStack.getType() != collectorItem.getType()) return false;
-
-    return itemStack.isSimilar(collectorItem);
+  private void removeBlockAt(Location location) {
+    CollectorsPlugin.getInstance().getFastBlockUpdate().run(location, Material.AIR, false);
   }
 
 }

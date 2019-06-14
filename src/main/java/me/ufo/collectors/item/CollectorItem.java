@@ -32,4 +32,12 @@ public class CollectorItem {
     return item;
   }
 
+  public static boolean is(ItemStack itemStack) {
+    if (itemStack == null || !itemStack.hasItemMeta()) return false;
+    ItemStack collectorItem = CollectorItem.get();
+    if (itemStack.getType() != collectorItem.getType()) return false;
+
+    return itemStack.isSimilar(collectorItem);
+  }
+
 }
