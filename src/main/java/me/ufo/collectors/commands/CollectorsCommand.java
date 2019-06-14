@@ -50,8 +50,7 @@ public class CollectorsCommand implements CommandExecutor {
       case "give": {
         final Player target = plugin.getServer().getPlayer(args[1]);
         if (target == null) {
-          sender.sendMessage(ChatColor.RED.toString() + "That player cannot be found.");
-          return false;
+          return Style.message(sender, ChatColor.RED.toString() + "That player cannot be found.");
         }
 
         int amount;
