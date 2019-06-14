@@ -28,8 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class CollectorsPlugin extends JavaPlugin {
 
-  @Getter
-  private static CollectorsPlugin instance;
+  @Getter private static CollectorsPlugin instance;
 
   private FastBlockUpdate fastBlockUpdate;
 
