@@ -9,6 +9,10 @@ import org.bukkit.command.CommandSender;
 
 public final class Style {
 
+  private Style() {
+    throw new RuntimeException("Cannot instantiate utility class.");
+  }
+
   public static String translate(String in) {
     return ChatColor.translateAlternateColorCodes('&', in);
   }
