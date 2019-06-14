@@ -119,7 +119,8 @@ public class PlayerListener implements Listener {
 
   @EventHandler
   public void onEntityExplodeEvent(EntityExplodeEvent event) {
-    for (int i = 0; i < event.blockList().size(); i++) {
+    final int size = event.blockList().size();
+    for (int i = 0; i < size; i++) {
       if (event.blockList().get(i).getType() != Material.BEACON) continue;
 
       final Location location = event.blockList().get(i).getLocation();
