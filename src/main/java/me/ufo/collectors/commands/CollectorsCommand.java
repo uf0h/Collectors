@@ -28,9 +28,10 @@ public class CollectorsCommand implements CommandExecutor {
 
     if (args.length == 0) {
       return Style.message(sender,
-          "&e/collector give <target> <amount> &7- &dGive collector to player.",
-          "&e/collector set <collectionType> <amount> &7- &dSet amounts of collection type in a collector you are stood above.",
-          "&e/collector remove &7- &dRemoves a collector from the chunk you are standing in.");
+          "&eCollectors " + this.plugin.getDescription().getVersion() + " help:",
+          "&e/collector give <target> <amount>: &fgive collector to player",
+          "&e/colector set <type> <amount>: &fset amount of type in collector",
+          "&e/collector remove: &fremove collector from chunk");
     }
 
     switch (args[0].toLowerCase()) {
@@ -95,6 +96,13 @@ public class CollectorsCommand implements CommandExecutor {
           return Style.message(sender, ChatColor.RED.toString() + "There is no collector in this chunk.");
         }
       }
+
+      default:
+        return Style.message(sender,
+            "&eCollectors " + this.plugin.getDescription().getVersion() + " help:",
+            "&e/collector give <target> <amount>: &fgive collector to player",
+            "&e/colector set <type> <amount>: &fset amount of type in collector",
+            "&e/collector remove: &fremove collector from chunk");
     }
 
     return false;
