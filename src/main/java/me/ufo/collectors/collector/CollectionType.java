@@ -40,10 +40,12 @@ public enum CollectionType {
   private final FileConfiguration config = CollectorsPlugin.getInstance().getConfig();
   private final String PATH = "collection-types." + this + ".";
 
-  @Getter private Material material;
-  @Getter private EntityType entityType;
-  @Getter @Setter private double sellPrice;
-  @Setter private List<String> lore;
+  private Material material;
+  private EntityType entityType;
+  private List<String> lore;
+
+  @Getter private double sellPrice;
+  @Getter private int slot;
 
   CollectionType(Material material) {
     this.material = material;
@@ -55,17 +57,25 @@ public enum CollectionType {
 
   // ... store sell prices
   public static boolean initialize(CollectorsPlugin plugin) {
-    for (CollectionType collectionType : CollectionType.values()) {
-      if (collectionType == CollectionType.CREEPER) continue;
-      if (collectionType == CollectionType.CAVE_SPIDER) continue;
-      final String PATH = "collection-types." + collectionType + ".";
+    try {
+      for (CollectionType collectionType : CollectionType.values()) {
+        // ... cave spiders are included within the spider type
+        if (collectionType == CollectionType.CAVE_SPIDER) continue;
+        final String PATH = "collection-types." + collectionType + ".";
 
-      if (plugin.getConfig().get(PATH) != null) {
-        collectionType.setSellPrice(plugin.getConfig().getDouble(PATH + "sell-price"));
-        collectionType.setLore(Style.translate(plugin.getConfig().getStringList(PATH + "lore")));
-      } else {
-        return false;
+        if (plugin.getConfig().get(PATH) != null) {
+          // ... creepers are not given a sell price as they deposit tnt into the players inventory
+          if (collectionType != CollectionType.CREEPER)
+            collectionType.sellPrice = plugin.getConfig().getDouble(PATH + "sell-price");
+          collectionType.lore = Style.translate(plugin.getConfig().getStringList(PATH + "lore"));
+          collectionType.slot = plugin.getConfig().getInt(PATH + "gui-slot");
+        } else {
+          return false;
+        }
       }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
     }
     return true;
   }
@@ -101,10 +111,6 @@ public enum CollectionType {
   public List<String> getLore(Collector collector) {
     return this.lore.stream().map(s ->
         StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this)))).collect(Collectors.toList());
-  }
-
-  public int getSlot() {
-    return this.config.getInt(PATH + "gui-slot");
   }
 
 }
