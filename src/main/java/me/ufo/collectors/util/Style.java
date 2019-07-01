@@ -21,7 +21,7 @@ public final class Style {
     final int size = in.size();
     final List<String> out = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      out.set(i, ChatColor.translateAlternateColorCodes('&', in.get(i)));
+      out.add(ChatColor.translateAlternateColorCodes('&', in.get(i)));
     }
     return out;
   }
