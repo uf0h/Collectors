@@ -1,26 +1,16 @@
 package me.ufo.collectors.listeners;
 
-import com.massivecraft.factions.entity.BoardColl;
-import com.massivecraft.factions.entity.MPlayer;
-import com.massivecraft.massivecore.ps.PS;
-import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
-import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.IBlockData;
-import net.minecraft.server.v1_8_R3.World;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -44,7 +34,7 @@ public class PlayerListener implements Listener {
             return;
           }
 
-          if (BoardColl.get().getFactionAt(PS.valueOf(event.getBlock())).isNone()) {
+          if (Factions.isWilderness(event.getBlock())) {
             event.getPlayer().sendMessage(ChatColor.RED.toString() + "Collectors must be placed in your claimed faction land.");
             event.setCancelled(true);
             return;
@@ -86,9 +76,7 @@ public class PlayerListener implements Listener {
             return;
           }
 
-          Collector.get(event.getBlock().getLocation()).remove(true);
-          event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), CollectorItem.get());
-
+          Collector.get(event.getBlock().getLocation()).drop();
           event.getPlayer().sendMessage(ChatColor.RED.toString() + "You have removed a collector from this chunk.");
         }
       }
@@ -130,8 +118,7 @@ public class PlayerListener implements Listener {
       final Location location = event.blockList().get(i).getLocation();
       if (Collector.chunkHasCollector(location)) {
         if (Collector.isCollector(location)) {
-          Collector.get(location).remove(true);
-          location.getWorld().dropItem(location, CollectorItem.get());
+          Collector.get(location).drop();
         }
       }
     }
@@ -167,10 +154,10 @@ public class PlayerListener implements Listener {
                   return;
                 }
 
-                if (Outpost.isFactionControllingOutpost(MPlayer.get(event.getPlayer()).getFaction())) {
+                /*if (Outpost.isFactionControllingOutpost(event.getPlayer())) {
                   totalValue *= 2;
                   event.getPlayer().sendMessage(ChatColor.RED.toString() + "You will receive " + ChatColor.GREEN.toString() + "x2" + ChatColor.RED.toString() + " value as you are controlling outpost.");
-                }
+                }*/
 
                 collector.getAmounts().entrySet().stream()
                     .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)

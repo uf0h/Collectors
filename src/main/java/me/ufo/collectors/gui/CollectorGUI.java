@@ -1,13 +1,11 @@
 package me.ufo.collectors.gui;
 
-import com.massivecraft.factions.entity.MPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
-import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.util.NBTItem;
 import me.ufo.collectors.util.Style;
 import org.bukkit.Bukkit;
@@ -108,9 +106,9 @@ public class CollectorGUI extends GUI {
 
         double sellPrice = collectionType.getSellPrice();
 
-        if (Outpost.isFactionControllingOutpost(MPlayer.get(player).getFaction())) {
+        /*if (Outpost.isFactionControllingOutpost(MPlayer.get(player).getFaction())) {
           sellPrice *= 2;
-        }
+        }*/
 
         if (Econ.depositAmountToPlayer(player, (100 * sellPrice))) {
           this.collector.decrement(collectionType, 100);

@@ -39,7 +39,7 @@ public class CollectorsCommand implements CommandExecutor {
         if (sender instanceof Player) {
           final Location location = ((Player) sender).getLocation();
           if (Collector.chunkHasCollector(location)) {
-            Collector.get(location).remove(true);
+            Collector.get(location).drop();
             return Style.message(sender,
                 ChatColor.RED.toString() + "Collector removed from x: " + location.getBlockX() + ", y: " + location.getBlockY() + ", z: " + location.getBlockZ() + ".");
           }

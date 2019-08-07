@@ -3,7 +3,7 @@ author: ufo
 version: ${project.version}
 main: me.ufo.collectors.CollectorsPlugin
 description: ${project.description}
-depend: [Vault, WorldGuard, Factions, Ace-Outposts]
+depend: [Vault, WorldGuard, Factions]
 commands:
   collectors:
     aliases: [collector]

@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.Getter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.gui.CollectorGUI;
+import me.ufo.collectors.item.CollectorItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -148,12 +149,13 @@ public class Collector {
     if (this.collectorGUI != null) this.collectorGUI.update(collectionType);
   }
 
-  public void remove(boolean removeBlock) {
+  public void drop() {
     this.amounts.clear();
     this.viewers.forEach(uuid -> CollectorsPlugin.getInstance().getServer().getPlayer(uuid).closeInventory());
     this.viewers.clear();
 
-    if (removeBlock) this.location.getBlock().setType(Material.AIR);
+    this.location.getBlock().setType(Material.AIR);
+    this.location.getWorld().dropItem(this.location, CollectorItem.get());
 
     collectorCache.remove(serialize(this.location));
   }

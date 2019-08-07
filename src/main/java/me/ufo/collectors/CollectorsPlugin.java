@@ -12,7 +12,6 @@ import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
 import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
-import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.listeners.EntityListener;
 import me.ufo.collectors.listeners.FactionListener;
@@ -68,7 +67,7 @@ public class CollectorsPlugin extends JavaPlugin {
 
     this.getCommand("collectors").setExecutor(new CollectorsCommand());
 
-    this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new FactionListener());
+    this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener());
 
     this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
@@ -86,10 +85,9 @@ public class CollectorsPlugin extends JavaPlugin {
     new Econ().setup();
     new Factions().setup();
     new Worldguard().setup();
-    new Outpost().setup();
   }
 
-  private void registerListeners(Listener... listeners) {
+  public void registerListeners(Listener... listeners) {
     for (Listener listener : listeners) {
       this.getServer().getPluginManager().registerEvents(listener, this);
     }
