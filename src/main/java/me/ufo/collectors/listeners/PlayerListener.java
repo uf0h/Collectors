@@ -11,11 +11,16 @@ import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Outpost;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.IBlockData;
+import net.minecraft.server.v1_8_R3.World;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -106,7 +111,7 @@ public class PlayerListener implements Listener {
 
         Block next = event.getBlock();
         while (next != null && next.getType() == Material.SUGAR_CANE_BLOCK) {
-          this.removeBlockAt(next.getLocation());
+          next.getLocation().getBlock().setType(Material.AIR);
           amountOfCane += 1;
           next = next.getRelative(BlockFace.UP);
         }
@@ -184,10 +189,6 @@ public class PlayerListener implements Listener {
         }
       }
     }
-  }
-
-  private void removeBlockAt(Location location) {
-    CollectorsPlugin.getInstance().getFastBlockUpdate().run(location, Material.AIR, false);
   }
 
 }

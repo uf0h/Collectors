@@ -10,8 +10,6 @@ import me.ufo.collectors.adapters.LocationTypeAdapter;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.commands.CollectorsCommand;
-import me.ufo.collectors.fastblockupdate.FastBlockUpdate;
-import me.ufo.collectors.fastblockupdate.impl.FastBlockUpdate_1_8_R3;
 import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Outpost;
@@ -29,8 +27,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class CollectorsPlugin extends JavaPlugin {
 
   @Getter private static CollectorsPlugin instance;
-
-  private FastBlockUpdate fastBlockUpdate;
 
   private Gson gson;
 
@@ -73,8 +69,6 @@ public class CollectorsPlugin extends JavaPlugin {
     this.getCommand("collectors").setExecutor(new CollectorsCommand());
 
     this.registerListeners(new PlayerListener(), new InventoryListener(), new EntityListener(), new FactionListener());
-
-    this.fastBlockUpdate = new FastBlockUpdate_1_8_R3();
 
     this.getLogger().info("Successfully loaded. Took (" + (System.currentTimeMillis() - startTime) + "ms).");
 
