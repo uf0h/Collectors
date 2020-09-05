@@ -1,7 +1,6 @@
 package me.ufo.collectors.adapters;
 
 import java.io.IOException;
-
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -13,7 +12,7 @@ import org.bukkit.World;
 public class LocationTypeAdapter extends TypeAdapter<Location> {
 
   @Override
-  public void write(JsonWriter writer, Location location) throws IOException {
+  public void write(final JsonWriter writer, final Location location) throws IOException {
     if (location != null && location.getWorld() != null) {
       writer.beginArray();
       writer.value(location.getWorld().getName());
@@ -30,7 +29,7 @@ public class LocationTypeAdapter extends TypeAdapter<Location> {
   }
 
   @Override
-  public Location read(JsonReader reader) throws IOException {
+  public Location read(final JsonReader reader) throws IOException {
     if (reader.peek() != JsonToken.NULL) {
       reader.beginArray();
       final World world = CollectorsPlugin.getInstance().getServer().getWorld(reader.nextString());

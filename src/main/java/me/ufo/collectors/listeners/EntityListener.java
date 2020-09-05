@@ -3,23 +3,15 @@ package me.ufo.collectors.listeners;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.Blocks;
-import net.minecraft.server.v1_8_R3.EnumDirection;
 import net.techcable.tacospigot.event.entity.SpawnerPreSpawnEvent;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockGrowEvent;
 
 public class EntityListener implements Listener {
 
   private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
 
-  @EventHandler
+  /*@EventHandler
   public void onBlockGrowEvent(BlockGrowEvent event) {
     try { // TEMP
       if (event.getBlock() != null) {
@@ -35,30 +27,30 @@ public class EntityListener implements Listener {
       }
     } catch (Exception ignored) {
     }
-  }
+  }*/
 
   @EventHandler
-  public void onSpawnerPreSpawnEvent(SpawnerPreSpawnEvent event) {
+  public void onSpawnerPreSpawnEvent(final SpawnerPreSpawnEvent event) {
     try { // TEMP
       CollectionType collectionType = CollectionType.parse(event.getSpawnedType());
       if (collectionType != null) {
         event.setCancelled(true);
         final Collector collector = Collector.get(event.getLocation());
         if (collector != null) {
-          if (collectionType == CollectionType.CAVE_SPIDER) collectionType = CollectionType.SPIDER;
+          if (collectionType == CollectionType.CAVE_SPIDER) {
+            collectionType = CollectionType.SPIDER;
+          }
 
           if (collectionType == CollectionType.CREEPER) {
-            collector.increment(collectionType, 2);
-          } else {
             collector.increment(collectionType);
           }
         }
       }
-    } catch (Exception ignored) {
+    } catch (final Exception ignored) {
     }
   }
 
-  private boolean blockCannotGrow(World world, Block block) {
+  /*private boolean blockCannotGrow(World world, Block block) {
     final BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
     final net.minecraft.server.v1_8_R3.World nmsWorld = ((CraftWorld) world).getHandle();
 
@@ -70,6 +62,6 @@ public class EntityListener implements Listener {
 
     final net.minecraft.server.v1_8_R3.Block NMSBlock = nmsWorld.getType(blockPosition.down()).getBlock();
     return NMSBlock == Blocks.CACTUS || NMSBlock == Blocks.SAND;
-  }
+  }*/
 
 }

@@ -35,13 +35,12 @@ public enum CollectionType {
   VILLAGER(EntityType.VILLAGER),
   WITCH(EntityType.WITCH);
 
+  public static CollectionType[] cachedValues = CollectionType.values();
   private final FileConfiguration config = CollectorsPlugin.getInstance().getConfig();
   private final String PATH = "collection-types." + this + ".";
-
   private Material material;
   private EntityType entityType;
   private List<String> lore;
-
   @Getter
   private double sellPrice;
   @Getter
@@ -53,54 +52,6 @@ public enum CollectionType {
 
   CollectionType(final EntityType entityType) {
     this.entityType = entityType;
-  }
-
-  public static CollectionType[] cachedValues = CollectionType.values();
-
-  // ... store sell prices
-  public static boolean initialize(final CollectorsPlugin plugin) {
-    try {
-      for (final CollectionType collectionType : CollectionType.cachedValues) {
-        // ... cave spiders are included within the spider type
-        if (collectionType == CollectionType.CAVE_SPIDER) {
-          continue;
-        }
-        final String PATH = "collection-types." + collectionType + ".";
-
-        if (plugin.getConfig().get(PATH) != null) {
-          // ... creepers are not given a sell price as they deposit tnt into the players inventory
-          if (collectionType != CollectionType.CREEPER) {
-            collectionType.sellPrice = plugin.getConfig().getDouble(PATH + "sell-price");
-          }
-          collectionType.lore = Style.translate(plugin.getConfig().getStringList(PATH + "lore"));
-          collectionType.slot = plugin.getConfig().getInt(PATH + "gui-slot");
-        } else {
-          return false;
-        }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
-    return true;
-  }
-
-  public static CollectionType parse(final EntityType entityType) {
-    for (final CollectionType collectionType : cachedValues) {
-      if (collectionType.entityType == entityType) {
-        return collectionType;
-      }
-    }
-    return null;
-  }
-
-  public static CollectionType parse(final Material material) {
-    for (final CollectionType collectionType : cachedValues) {
-      if (collectionType.material == material) {
-        return collectionType;
-      }
-    }
-    return null;
   }
 
   public ItemStack getItemStack(final Collector collector) {
@@ -127,6 +78,52 @@ public enum CollectionType {
         "" + collector.getAmountOfCollectionType(this)));
     }
     return out;
+  }
+
+  // ... store sell prices
+  public static boolean initialize(final CollectorsPlugin plugin) {
+    try {
+      for (final CollectionType collectionType : CollectionType.cachedValues) {
+        // ... cave spiders are included within the spider type
+        if (collectionType == CollectionType.CAVE_SPIDER) {
+          continue;
+        }
+        final String PATH = "collection-types." + collectionType + ".";
+
+        if (plugin.getConfig().get(PATH) != null) {
+          // ... creepers are not given a sell price as they deposit tnt into the players inventory
+          if (collectionType != CollectionType.CREEPER) {
+            collectionType.sellPrice = plugin.getConfig().getDouble(PATH + "sell-price");
+          }
+          collectionType.lore = Style.translate(plugin.getConfig().getStringList(PATH + "lore"));
+          collectionType.slot = plugin.getConfig().getInt(PATH + "gui-slot");
+        } else {
+          return false;
+        }
+      }
+    } catch (final Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
+  }
+
+  public static CollectionType parse(final EntityType entityType) {
+    for (final CollectionType collectionType : cachedValues) {
+      if (collectionType.entityType == entityType) {
+        return collectionType;
+      }
+    }
+    return null;
+  }
+
+  public static CollectionType parse(final Material material) {
+    for (final CollectionType collectionType : cachedValues) {
+      if (collectionType.material == material) {
+        return collectionType;
+      }
+    }
+    return null;
   }
 
 }

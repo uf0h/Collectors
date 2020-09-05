@@ -6,45 +6,76 @@ import org.bukkit.inventory.ItemStack;
 
 public class NBTItem {
 
-  private net.minecraft.server.v1_8_R3.ItemStack nmsItemStack;
-  private NBTTagCompound rootCompound;
+  private final net.minecraft.server.v1_8_R3.ItemStack nmsItemStack;
+  private final NBTTagCompound rootCompound;
 
-  public NBTItem(ItemStack startItemStack) {
+  private enum PrimitiveClass {
+
+    BOOLEAN(boolean.class, Boolean.TRUE.getClass(), Boolean.FALSE.getClass()),
+    BYTE(byte.class),
+    DOUBLE(double.class),
+    INT(int.class),
+    LONG(long.class),
+    SHORT(short.class),
+    STRING(String.class);
+
+    private static final PrimitiveClass[] cachedValues = PrimitiveClass.values();
+    private final Class[] classes;
+
+    PrimitiveClass(final Class... classes) {
+      this.classes = classes;
+    }
+
+    public static PrimitiveClass get(final Class aClass) {
+      for (final PrimitiveClass value : cachedValues) {
+        for (final Class clazz : value.classes) {
+          if (clazz.getName().equalsIgnoreCase(aClass.getName())) {
+            return value;
+          }
+        }
+      }
+      return null;
+    }
+  }
+
+  public NBTItem(final ItemStack startItemStack) {
     this.nmsItemStack = CraftItemStack.asNMSCopy(startItemStack);
     this.rootCompound = nmsItemStack.hasTag() ? nmsItemStack.getTag() : new NBTTagCompound();
   }
 
-  public boolean getBoolean(String key) {
+  public boolean getBoolean(final String key) {
     return rootCompound.getBoolean(key);
   }
 
-  public String getString(String key) {
+  public String getString(final String key) {
     return rootCompound.getString(key);
   }
 
-  public double getDouble(String key) {
+  public double getDouble(final String key) {
     return rootCompound.getDouble(key);
   }
 
-  public int getInt(String key) {
+  public int getInt(final String key) {
     return rootCompound.getInt(key);
   }
 
-  public long getLong(String key) {
+  public long getLong(final String key) {
     return rootCompound.getLong(key);
   }
 
-  public short getShort(String key) {
+  public short getShort(final String key) {
     return rootCompound.getShort(key);
   }
 
-  public short getByte(String key) {
+  public short getByte(final String key) {
     return rootCompound.getByte(key);
   }
 
-  public NBTItem set(String key, Object value) {
-    PrimitiveClass primitiveClass = PrimitiveClass.get(value.getClass());
-    if (primitiveClass == null) throw new RuntimeException("That datatype is not supported.");
+  public NBTItem set(final String key, final Object value) {
+    final PrimitiveClass primitiveClass = PrimitiveClass.get(value.getClass());
+    if (primitiveClass == null) {
+      throw new RuntimeException("That datatype is not supported.");
+    }
 
     switch (primitiveClass) {
       case BOOLEAN:
@@ -75,34 +106,6 @@ public class NBTItem {
 
   public ItemStack buildItemStack() {
     return CraftItemStack.asBukkitCopy(nmsItemStack);
-  }
-
-  private enum PrimitiveClass {
-
-    BOOLEAN(boolean.class, Boolean.TRUE.getClass(), Boolean.FALSE.getClass()),
-    BYTE(byte.class),
-    DOUBLE(double.class),
-    INT(int.class),
-    LONG(long.class),
-    SHORT(short.class),
-    STRING(String.class);
-
-    private Class[] classes;
-
-    PrimitiveClass(Class... classes) {
-      this.classes = classes;
-    }
-
-    public static PrimitiveClass get(Class aClass) {
-      for (PrimitiveClass value : values()) {
-        for (Class clazz : value.classes) {
-          if (clazz.getName().equalsIgnoreCase(aClass.getName())) {
-            return value;
-          }
-        }
-      }
-      return null;
-    }
   }
 
 }

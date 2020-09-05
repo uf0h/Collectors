@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class InventoryListener implements Listener {
 
   @EventHandler
-  public void onInventoryClickEvent(InventoryClickEvent event) {
+  public void onInventoryClickEvent(final InventoryClickEvent event) {
     if (event.getClickedInventory() != null) {
       if (event.getClickedInventory().getHolder() instanceof GUI) {
         event.setCancelled(true);
@@ -21,14 +21,14 @@ public class InventoryListener implements Listener {
   }
 
   @EventHandler
-  public void onInventoryCloseEvent(InventoryCloseEvent event) {
+  public void onInventoryCloseEvent(final InventoryCloseEvent event) {
     if (event.getInventory().getHolder() instanceof GUI) {
       Collector.removeViewer(event.getPlayer().getUniqueId());
     }
   }
 
   @EventHandler
-  public void onPlayerQuitEvent(PlayerQuitEvent event) {
+  public void onPlayerQuitEvent(final PlayerQuitEvent event) {
     Collector.removeViewer(event.getPlayer().getUniqueId());
   }
 

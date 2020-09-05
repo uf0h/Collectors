@@ -13,8 +13,8 @@ public class CollectorItem {
   private static final String PATH = "collector-item.";
 
   public static ItemStack get() {
-    ItemStack item = new ItemStack(Material.BEACON);
-    ItemMeta itemMeta = item.getItemMeta();
+    final ItemStack item = new ItemStack(Material.BEACON);
+    final ItemMeta itemMeta = item.getItemMeta();
     itemMeta.setDisplayName(Style.translate(config.getString(PATH + "name")));
     itemMeta.setLore(Style.translate(config.getStringList(PATH + "lore")));
     item.setItemMeta(itemMeta);
@@ -22,9 +22,9 @@ public class CollectorItem {
     return item;
   }
 
-  public static ItemStack get(int amount) {
-    ItemStack item = new ItemStack(Material.BEACON, amount);
-    ItemMeta itemMeta = item.getItemMeta();
+  public static ItemStack get(final int amount) {
+    final ItemStack item = new ItemStack(Material.BEACON, amount);
+    final ItemMeta itemMeta = item.getItemMeta();
     itemMeta.setDisplayName(Style.translate(config.getString(PATH + "name")));
     itemMeta.setLore(Style.translate(config.getStringList(PATH + "lore")));
     item.setItemMeta(itemMeta);
@@ -32,10 +32,14 @@ public class CollectorItem {
     return item;
   }
 
-  public static boolean is(ItemStack itemStack) {
-    if (itemStack == null || !itemStack.hasItemMeta()) return false;
-    ItemStack collectorItem = CollectorItem.get();
-    if (itemStack.getType() != collectorItem.getType()) return false;
+  public static boolean is(final ItemStack itemStack) {
+    if (itemStack == null || !itemStack.hasItemMeta()) {
+      return false;
+    }
+    final ItemStack collectorItem = CollectorItem.get();
+    if (itemStack.getType() != collectorItem.getType()) {
+      return false;
+    }
 
     return itemStack.isSimilar(collectorItem);
   }

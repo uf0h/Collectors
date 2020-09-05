@@ -11,10 +11,6 @@ public class Worldguard {
   public static WorldGuardPlugin worldguard = null;
   private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
 
-  public static boolean playerCanPlaceHere(Player player, Block block) {
-    return worldguard.canBuild(player, block);
-  }
-
   public void setup() {
     if (!setupWorldguard()) {
       this.plugin.getLogger().info("WORLDGUARD DEPENDENCY NOT FOUND.");
@@ -27,6 +23,10 @@ public class Worldguard {
 
   private boolean setupWorldguard() {
     return Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null;
+  }
+
+  public static boolean playerCanPlaceHere(final Player player, final Block block) {
+    return worldguard.canBuild(player, block);
   }
 
 }

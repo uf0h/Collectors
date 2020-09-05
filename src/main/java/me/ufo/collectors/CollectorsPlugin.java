@@ -2,7 +2,6 @@ package me.ufo.collectors;
 
 import java.io.File;
 import java.io.IOException;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -14,7 +13,6 @@ import me.ufo.collectors.integration.Econ;
 import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.listeners.EntityListener;
-import me.ufo.collectors.listeners.FactionListener;
 import me.ufo.collectors.listeners.InventoryListener;
 import me.ufo.collectors.listeners.PlayerListener;
 import me.ufo.collectors.tasks.CollectorSaveTask;
@@ -25,7 +23,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class CollectorsPlugin extends JavaPlugin {
 
-  @Getter private static CollectorsPlugin instance;
+  @Getter
+  private static CollectorsPlugin instance;
 
   private Gson gson;
 
@@ -33,11 +32,11 @@ public class CollectorsPlugin extends JavaPlugin {
 
   public CollectorsPlugin() {
     this.saveDefaultConfig();
-    File dataFile = new File(this.getDataFolder() + "/data.json");
+    final File dataFile = new File(this.getDataFolder() + "/data.json");
     if (!dataFile.exists()) {
       try {
         dataFile.createNewFile();
-      } catch (IOException e) {
+      } catch (final IOException e) {
         e.printStackTrace();
       }
     }
@@ -45,15 +44,15 @@ public class CollectorsPlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    long startTime = System.currentTimeMillis();
+    final long startTime = System.currentTimeMillis();
 
     instance = this;
 
     this.registerDependencies();
 
     this.gson = new GsonBuilder()
-        .registerTypeAdapter(Location.class, new LocationTypeAdapter())
-        .disableHtmlEscaping().setPrettyPrinting().create();
+      .registerTypeAdapter(Location.class, new LocationTypeAdapter())
+      .disableHtmlEscaping().setPrettyPrinting().create();
 
     if (!Collector.initialize(this)) {
       this.getLogger().warning("Collectors have failed to be loaded into memory.");
@@ -87,8 +86,8 @@ public class CollectorsPlugin extends JavaPlugin {
     new Worldguard().setup();
   }
 
-  public void registerListeners(Listener... listeners) {
-    for (Listener listener : listeners) {
+  public void registerListeners(final Listener... listeners) {
+    for (final Listener listener : listeners) {
       this.getServer().getPluginManager().registerEvents(listener, this);
     }
   }

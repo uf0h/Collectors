@@ -11,10 +11,12 @@ public class CollectorSaveTask extends BukkitRunnable {
   @Override
   public void run() {
     if (!Collector.getCollectorCache().isEmpty()) {
-      long startTime = System.currentTimeMillis();
-      plugin.getLogger().info("========== STARTING SAVE TASK (" + Collector.getCollectorCache().size() + ") ==========");
+      final long startTime = System.currentTimeMillis();
+      plugin.getLogger()
+        .info("========== STARTING SAVE TASK (" + Collector.getCollectorCache().size() + ") ==========");
       Collector.saveall();
-      plugin.getLogger().warning("========== SAVE TASK COMPLETED IN (" + (System.currentTimeMillis() - startTime) + "ms) ==========");
+      plugin.getLogger().warning(
+        "========== SAVE TASK COMPLETED IN (" + (System.currentTimeMillis() - startTime) + "ms) ==========");
     }
   }
 

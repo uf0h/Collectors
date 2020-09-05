@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -20,8 +21,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class PlayerListener implements Listener {
 
-  @EventHandler
-  public void onBlockPlaceEvent(BlockPlaceEvent event) {
+  @EventHandler(
+    priority = EventPriority.HIGHEST,
+    ignoreCancelled = true
+  )
+  public void onBlockPlaceEvent(final BlockPlaceEvent event) {
     //if (event.isCancelled()) return;
 
     if (event.getBlockPlaced().getType() == Material.BEACON) {
@@ -35,7 +39,8 @@ public class PlayerListener implements Listener {
           }
 
           if (Factions.isWilderness(event.getBlock())) {
-            event.getPlayer().sendMessage(ChatColor.RED.toString() + "Collectors must be placed in your claimed faction land.");
+            event.getPlayer().sendMessage(
+              ChatColor.RED.toString() + "Collectors must be placed in your claimed faction land.");
             event.setCancelled(true);
             return;
           }
@@ -46,14 +51,17 @@ public class PlayerListener implements Listener {
             final Collector collector = Collector.get(event.getBlockPlaced().getLocation());
 
             event.getPlayer().sendMessage(new String[]{
-                ChatColor.RED.toString() + "There is already a collector in this chunk.",
-                ChatColor.RED.toString() + "You can find it at x: " + collector.getLocation().getBlockX() + ", y: " + collector.getLocation().getBlockY() + ", z: " + collector.getLocation().getBlockZ() + "."
+              ChatColor.RED.toString() + "There is already a collector in this chunk.",
+              ChatColor.RED.toString() + "You can find it at x: " + collector.getLocation()
+                .getBlockX() + ", y: " + collector.getLocation().getBlockY() + ", z: " + collector
+                .getLocation().getBlockZ() + "."
             });
             return;
           }
 
           Collector.add(event.getBlockPlaced().getLocation());
-          event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "You have placed a collector in this chunk.");
+          event.getPlayer()
+            .sendMessage(ChatColor.GREEN.toString() + "You have placed a collector in this chunk.");
         } else {
           // ... Prevent placing regular beacons.
           event.setCancelled(true);
@@ -63,8 +71,10 @@ public class PlayerListener implements Listener {
   }
 
   @EventHandler
-  public void onBlockBreakEvent(BlockBreakEvent event) {
-    if (event.isCancelled()) return;
+  public void onBlockBreakEvent(final BlockBreakEvent event) {
+    if (event.isCancelled()) {
+      return;
+    }
 
     if (event.getBlock().getType() == Material.BEACON) {
       if (Collector.chunkHasCollector(event.getBlock().getLocation())) {
@@ -77,7 +87,8 @@ public class PlayerListener implements Listener {
           }
 
           Collector.get(event.getBlock().getLocation()).drop();
-          event.getPlayer().sendMessage(ChatColor.RED.toString() + "You have removed a collector from this chunk.");
+          event.getPlayer()
+            .sendMessage(ChatColor.RED.toString() + "You have removed a collector from this chunk.");
         }
       }
 
@@ -110,10 +121,12 @@ public class PlayerListener implements Listener {
   }
 
   @EventHandler
-  public void onEntityExplodeEvent(EntityExplodeEvent event) {
+  public void onEntityExplodeEvent(final EntityExplodeEvent event) {
     final int size = event.blockList().size();
     for (int i = 0; i < size; i++) {
-      if (event.blockList().get(i).getType() != Material.BEACON) continue;
+      if (event.blockList().get(i).getType() != Material.BEACON) {
+        continue;
+      }
 
       final Location location = event.blockList().get(i).getLocation();
       if (Collector.chunkHasCollector(location)) {
@@ -125,7 +138,7 @@ public class PlayerListener implements Listener {
   }
 
   @EventHandler
-  public void onPlayerInteractEvent(PlayerInteractEvent event) {
+  public void onPlayerInteractEvent(final PlayerInteractEvent event) {
     if (event.getClickedBlock() != null) {
       if (event.getClickedBlock().getType() == Material.BEACON) {
         if (Collector.isCollector(event.getClickedBlock().getLocation())) {
@@ -133,38 +146,46 @@ public class PlayerListener implements Listener {
 
           switch (event.getAction()) {
             case LEFT_CLICK_BLOCK:
-              if (event.getPlayer().getItemInHand() == null || event.getPlayer().getItemInHand().getType() == Material.AIR) {
-                double totalValue = collector.getAmounts().entrySet().stream()
-                    .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
-                    .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
+              if (event.getPlayer().getItemInHand() == null || event.getPlayer().getItemInHand()
+                                                                 .getType() == Material.AIR) {
+                final double totalValue = collector.getAmounts().entrySet().stream()
+                  .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
+                  .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
 
-                event.getPlayer().sendMessage(ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN.toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
+                event.getPlayer().sendMessage(
+                  ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN
+                    .toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
               }
               break;
             case RIGHT_CLICK_BLOCK:
               event.setCancelled(true);
 
               if (event.getPlayer().isSneaking() && event.getPlayer().hasPermission("venom.anaconda")) {
-                double totalValue = collector.getAmounts().entrySet().stream()
-                    .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
-                    .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
+                final double totalValue = collector.getAmounts().entrySet().stream()
+                  .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
+                  .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
 
                 if (totalValue == 0) {
-                  event.getPlayer().sendMessage(ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN.toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
+                  event.getPlayer().sendMessage(
+                    ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN
+                      .toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
                   return;
                 }
 
                 /*if (Outpost.isFactionControllingOutpost(event.getPlayer())) {
                   totalValue *= 2;
-                  event.getPlayer().sendMessage(ChatColor.RED.toString() + "You will receive " + ChatColor.GREEN.toString() + "x2" + ChatColor.RED.toString() + " value as you are controlling outpost.");
+                  event.getPlayer().sendMessage(ChatColor.RED.toString() + "You will receive " + ChatColor
+                  .GREEN.toString() + "x2" + ChatColor.RED.toString() + " value as you are controlling
+                  outpost.");
                 }*/
 
                 collector.getAmounts().entrySet().stream()
-                    .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
-                    .forEach(entry -> entry.setValue(0));
+                  .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
+                  .forEach(entry -> entry.setValue(0));
 
                 if (Econ.depositAmountToPlayer(event.getPlayer(), totalValue)) {
-                  event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "+$" + totalValue + ChatColor.RED.toString() + " from selling everything in this collector.");
+                  event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "+$" + totalValue + ChatColor.RED
+                    .toString() + " from selling everything in this collector.");
                 }
 
                 return;

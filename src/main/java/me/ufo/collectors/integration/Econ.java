@@ -12,16 +12,6 @@ public class Econ {
   public static Economy econ = null;
   private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
 
-  public static boolean withdrawAmountFromPlayer(Player player, double cost) {
-    EconomyResponse er = econ.withdrawPlayer(player, cost);
-    return er.transactionSuccess();
-  }
-
-  public static boolean depositAmountToPlayer(Player player, double amount) {
-    EconomyResponse er = econ.depositPlayer(player, amount);
-    return er.transactionSuccess();
-  }
-
   public void setup() {
     if (!setupEconomy()) {
       this.plugin.getLogger().info("VAULT DEPENDENCY NOT FOUND.");
@@ -35,12 +25,23 @@ public class Econ {
     if (Bukkit.getServer().getPluginManager().getPlugin("Vault") == null) {
       return false;
     }
-    RegisteredServiceProvider<Economy> rsp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
+    final RegisteredServiceProvider<Economy> rsp =
+      Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
     if (rsp == null) {
       return false;
     }
     econ = rsp.getProvider();
     return econ != null;
+  }
+
+  public static boolean withdrawAmountFromPlayer(final Player player, final double cost) {
+    final EconomyResponse er = econ.withdrawPlayer(player, cost);
+    return er.transactionSuccess();
+  }
+
+  public static boolean depositAmountToPlayer(final Player player, final double amount) {
+    final EconomyResponse er = econ.depositPlayer(player, amount);
+    return er.transactionSuccess();
   }
 
 }
