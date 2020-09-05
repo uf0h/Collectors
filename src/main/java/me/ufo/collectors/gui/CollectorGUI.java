@@ -51,7 +51,7 @@ public class CollectorGUI extends GUI {
     this.inventory.setItem(4, book);
 
     CollectorsPlugin.getInstance().getServer().getScheduler().runTask(CollectorsPlugin.getInstance(), () -> {
-      for (CollectionType collectionType : CollectionType.values()) {
+      for (final CollectionType collectionType : CollectionType.cachedValues) {
         if (collectionType == CollectionType.CAVE_SPIDER) continue;
 
         inventory.setItem(collectionType.getSlot(), collectionType.getItemStack(this.collector));
@@ -123,10 +123,10 @@ public class CollectorGUI extends GUI {
     });
   }
 
-  public void update(CollectionType collectionType) {
+  public void update(final CollectionType collectionType) {
     if (!this.collector.getViewers().isEmpty()) {
-      ItemStack itemStack = new ItemStack(this.inventory.getItem(collectionType.getSlot()));
-      ItemMeta itemMeta = itemStack.getItemMeta();
+      final ItemStack itemStack = new ItemStack(this.inventory.getItem(collectionType.getSlot()));
+      final ItemMeta itemMeta = itemStack.getItemMeta();
       itemMeta.setLore(collectionType.getLore(this.collector));
       itemStack.setItemMeta(itemMeta);
 

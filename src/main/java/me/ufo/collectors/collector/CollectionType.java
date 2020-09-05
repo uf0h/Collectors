@@ -1,10 +1,8 @@
 package me.ufo.collectors.collector;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.Getter;
-import lombok.Setter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.util.NBTItem;
 import me.ufo.collectors.util.Style;
@@ -21,7 +19,7 @@ public enum CollectionType {
   SUGAR_CANE(Material.SUGAR_CANE),
 
   CHICKEN(EntityType.CHICKEN),
-  //BLAZE(EntityType.BLAZE),
+  BLAZE(EntityType.BLAZE),
   RABBIT(EntityType.RABBIT),
   SPIDER(EntityType.SPIDER),
   CAVE_SPIDER(EntityType.CAVE_SPIDER),
@@ -44,29 +42,36 @@ public enum CollectionType {
   private EntityType entityType;
   private List<String> lore;
 
-  @Getter private double sellPrice;
-  @Getter private int slot;
+  @Getter
+  private double sellPrice;
+  @Getter
+  private int slot;
 
-  CollectionType(Material material) {
+  CollectionType(final Material material) {
     this.material = material;
   }
 
-  CollectionType(EntityType entityType) {
+  CollectionType(final EntityType entityType) {
     this.entityType = entityType;
   }
 
+  public static CollectionType[] cachedValues = CollectionType.values();
+
   // ... store sell prices
-  public static boolean initialize(CollectorsPlugin plugin) {
+  public static boolean initialize(final CollectorsPlugin plugin) {
     try {
-      for (CollectionType collectionType : CollectionType.values()) {
+      for (final CollectionType collectionType : CollectionType.cachedValues) {
         // ... cave spiders are included within the spider type
-        if (collectionType == CollectionType.CAVE_SPIDER) continue;
+        if (collectionType == CollectionType.CAVE_SPIDER) {
+          continue;
+        }
         final String PATH = "collection-types." + collectionType + ".";
 
         if (plugin.getConfig().get(PATH) != null) {
           // ... creepers are not given a sell price as they deposit tnt into the players inventory
-          if (collectionType != CollectionType.CREEPER)
+          if (collectionType != CollectionType.CREEPER) {
             collectionType.sellPrice = plugin.getConfig().getDouble(PATH + "sell-price");
+          }
           collectionType.lore = Style.translate(plugin.getConfig().getStringList(PATH + "lore"));
           collectionType.slot = plugin.getConfig().getInt(PATH + "gui-slot");
         } else {
@@ -80,27 +85,31 @@ public enum CollectionType {
     return true;
   }
 
-  public static CollectionType parse(EntityType entityType) {
-    for (CollectionType collectionType : CollectionType.values()) {
-      if (collectionType.entityType == entityType) return collectionType;
+  public static CollectionType parse(final EntityType entityType) {
+    for (final CollectionType collectionType : cachedValues) {
+      if (collectionType.entityType == entityType) {
+        return collectionType;
+      }
     }
     return null;
   }
 
-  public static CollectionType parse(Material material) {
-    for (CollectionType collectionType : CollectionType.values()) {
-      if (collectionType.material == material) return collectionType;
+  public static CollectionType parse(final Material material) {
+    for (final CollectionType collectionType : cachedValues) {
+      if (collectionType.material == material) {
+        return collectionType;
+      }
     }
     return null;
   }
 
-  public ItemStack getItemStack(Collector collector) {
-    String name = Style.translate(config.getString(PATH + "name"));
-    Material material = Material.getMaterial(config.getString(PATH + "material"));
-    int durability = config.getInt(PATH + "durability");
+  public ItemStack getItemStack(final Collector collector) {
+    final String name = Style.translate(config.getString(PATH + "name"));
+    final Material material = Material.getMaterial(config.getString(PATH + "material"));
+    final int durability = config.getInt(PATH + "durability");
 
-    ItemStack itemStack = new ItemStack(material, 1, (short) durability);
-    ItemMeta itemMeta = itemStack.getItemMeta();
+    final ItemStack itemStack = new ItemStack(material, 1, (short) durability);
+    final ItemMeta itemMeta = itemStack.getItemMeta();
     itemMeta.setDisplayName(name);
     itemMeta.setLore(this.getLore(collector));
     itemStack.setItemMeta(itemMeta);
@@ -108,9 +117,16 @@ public enum CollectionType {
     return new NBTItem(itemStack).set("CollectionItem", this.toString()).buildItemStack();
   }
 
-  public List<String> getLore(Collector collector) {
-    return this.lore.stream().map(s ->
-        StringUtils.replace(s, "%amount%", String.valueOf(collector.getAmountOfCollectionType(this)))).collect(Collectors.toList());
+  public List<String> getLore(final Collector collector) {
+    final int size = this.lore.size();
+    final List<String> out = new ArrayList<>(size);
+    for (int i = 0; i < size; i++) {
+      out.set(i, StringUtils.replaceOnce(
+        this.lore.get(i),
+        "%amount%",
+        "" + collector.getAmountOfCollectionType(this)));
+    }
+    return out;
   }
 
 }
