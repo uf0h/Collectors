@@ -1,6 +1,7 @@
 package me.ufo.collectors.commands;
 
 import java.util.Arrays;
+import javax.swing.*;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
@@ -47,6 +48,18 @@ public class CollectorsCommand implements CommandExecutor {
                                    .getBlockZ() + ".");
           }
           return Style.message(sender, ChatColor.RED.toString() + "There is no collector in this chunk.");
+        }
+        break;
+      }
+
+      case "lores": {
+        for (final CollectionType cachedValue : CollectionType.cachedValues) {
+          if (cachedValue.isEnabled()) {
+            sender.sendMessage(cachedValue.name() + ":");
+            for (final String line : cachedValue._getLore()) {
+              sender.sendMessage(line);
+            }
+          }
         }
         break;
       }

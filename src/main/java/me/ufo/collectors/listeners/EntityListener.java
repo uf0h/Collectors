@@ -1,15 +1,44 @@
 package me.ufo.collectors.listeners;
 
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
-import net.techcable.tacospigot.event.entity.SpawnerPreSpawnEvent;
+import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class EntityListener implements Listener {
 
   private final CollectorsPlugin plugin = CollectorsPlugin.getInstance();
+
+  @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+  public void onEntityDeathEvent(final EntityDeathEvent event) {
+    final Entity entity = event.getEntity();
+    final Collector collector = Collector.get(entity.getLocation());
+    if (collector == null) {
+      return;
+    }
+
+    final List<ItemStack> drops = event.getDrops();
+    final ItemStack drop = drops.get(0);
+    if (drop == null) {
+      return;
+    }
+
+    final CollectionType type = CollectionType.parse(event.getEntityType());
+    if (type == null) {
+      return;
+    }
+
+    collector.increment(type, drop.getAmount());
+    drops.clear();
+  }
 
   /*@EventHandler
   public void onBlockGrowEvent(BlockGrowEvent event) {
@@ -29,7 +58,7 @@ public class EntityListener implements Listener {
     }
   }*/
 
-  @EventHandler
+  /*@EventHandler
   public void onSpawnerPreSpawnEvent(final SpawnerPreSpawnEvent event) {
     try { // TEMP
       CollectionType collectionType = CollectionType.parse(event.getSpawnedType());
@@ -47,7 +76,9 @@ public class EntityListener implements Listener {
     } catch (final Exception e) {
       e.printStackTrace();
     }
-  }
+  }*/
+
+
 
   /*private boolean blockCannotGrow(World world, Block block) {
     final BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());

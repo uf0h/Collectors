@@ -189,9 +189,14 @@ public class Collector {
         CollectorsPlugin.getInstance().getDataFolder().toString() + "/data.json")) {
         final Object2ObjectOpenHashMap<String, Collector> out = new Object2ObjectOpenHashMap<>();
         final Map<String, Collector> collectorMap =
-          CollectorsPlugin.getInstance().getGson().fromJson(reader, new TypeToken<Map<String, Collector>>() {
-          }.getType());
-        collectorMap.forEach(out::put);
+          CollectorsPlugin.getInstance().getGson().fromJson(reader, new TypeToken<Map<String, Collector>>() {}.getType());
+        if (collectorMap != null) {
+          collectorMap.forEach((location, collector) -> {
+            if (location != null && collector != null) {
+              out.put(location, collector);
+            }
+          });
+        }
         return out;
       } catch (final IOException e) {
         CollectorsPlugin.getInstance().getLogger().warning("Failed to load collectors.");

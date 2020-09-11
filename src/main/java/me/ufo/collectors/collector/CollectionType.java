@@ -85,6 +85,10 @@ public enum CollectionType {
     return out;
   }
 
+  public List<String> _getLore() {
+    return lore;
+  }
+
   // ... store sell prices
   public static boolean initialize(final CollectorsPlugin plugin) {
     try {
@@ -116,6 +120,9 @@ public enum CollectionType {
 
   public static CollectionType parse(final EntityType entityType) {
     for (final CollectionType collectionType : cachedValues) {
+      if (!collectionType.enabled) {
+        continue;
+      }
       if (collectionType.entityType == entityType) {
         return collectionType;
       }
@@ -125,6 +132,9 @@ public enum CollectionType {
 
   public static CollectionType parse(final Material material) {
     for (final CollectionType collectionType : cachedValues) {
+      if (!collectionType.enabled) {
+        continue;
+      }
       if (collectionType.material == material) {
         return collectionType;
       }

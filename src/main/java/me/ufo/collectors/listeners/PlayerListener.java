@@ -1,7 +1,11 @@
 package me.ufo.collectors.listeners;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.common.util.concurrent.AtomicDouble;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
@@ -9,7 +13,7 @@ import me.ufo.collectors.integration.Factions;
 import me.ufo.collectors.integration.Worldguard;
 import me.ufo.collectors.item.CollectorItem;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -123,18 +127,24 @@ public class PlayerListener implements Listener {
   public void onEntityExplodeEvent(final EntityExplodeEvent event) {
     final List<Block> blockList = event.blockList();
     final int size = blockList.size();
+    final List<Chunk> checkedChunks = new ArrayList<>(4);
+
     for (int i = 0; i < size; i++) {
-      if (blockList.get(i).getType() != Material.BEACON) {
+      final Block block = blockList.get(i);
+      if (checkedChunks.contains(block.getChunk())) {
         continue;
       }
 
-      final Location location = blockList.get(i).getLocation();
-      if (Collector.chunkHasCollector(location)) {
-        if (Collector.isCollector(location)) {
-          Collector.get(location).drop();
-          break;
-        }
+      if (block.getType() != Material.BEACON) {
+        continue;
       }
+
+      final Collector collector = Collector.get(block.getLocation());
+      if (collector != null) {
+        collector.drop();
+      }
+
+      checkedChunks.add(block.getChunk());
     }
   }
 
@@ -159,13 +169,13 @@ public class PlayerListener implements Listener {
 
                 event.getPlayer().sendMessage(
                   ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN
-                    .toString() + "$" + totalValue.get() + ChatColor.RED.toString() + ".");
+                    .toString() + "$" + CollectorsPlugin.DF.format(totalValue.get()) + ChatColor.RED.toString() + ".");
               }
               break;
             case RIGHT_CLICK_BLOCK:
               event.setCancelled(true);
 
-              if (event.getPlayer().isSneaking() && event.getPlayer().hasPermission("venom.anaconda")) {
+              if (event.getPlayer().isSneaking() && event.getPlayer().hasPermission("collectors.shift_right_click_sell")) {
                 /*final double totalValue = collector.getAmounts().entrySet().stream()
                   .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
                   .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();*/
@@ -180,7 +190,7 @@ public class PlayerListener implements Listener {
                 if (totalValue.get() == 0) {
                   event.getPlayer().sendMessage(
                     ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN
-                      .toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
+                      .toString() + "$0" + ChatColor.RED.toString() + ".");
                   return;
                 }
 
@@ -195,15 +205,20 @@ public class PlayerListener implements Listener {
                   .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
                   .forEach(entry -> entry.setValue(0));*/
 
-                collector.getAmounts().object2IntEntrySet().fastForEach(entry -> {
+                final ObjectIterator<Object2IntMap.Entry<CollectionType>>
+                  iter  = collector.getAmounts().object2IntEntrySet().fastIterator();
+
+                while (iter.hasNext()) {
+                  final Object2IntMap.Entry<CollectionType> entry = iter.next();
                   if (entry.getKey() != CollectionType.CREEPER) {
                     entry.setValue(0);
                   }
-                });
+                }
 
                 if (Econ.depositAmountToPlayer(event.getPlayer(), totalValue.get())) {
-                  event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "+$" + totalValue.get() + ChatColor.RED
-                    .toString() + " from selling everything in this collector.");
+                  event.getPlayer()
+                    .sendMessage(ChatColor.GREEN.toString() + "+$" + CollectorsPlugin.DF.format(totalValue.get()) + ChatColor.RED
+                      .toString() + " from selling everything in this collector.");
                 }
 
                 return;

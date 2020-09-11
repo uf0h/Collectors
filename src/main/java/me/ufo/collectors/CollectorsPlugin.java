@@ -2,6 +2,7 @@ package me.ufo.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -23,14 +24,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class CollectorsPlugin extends JavaPlugin {
 
-  @Getter
-  private static CollectorsPlugin instance;
+  @Getter private static CollectorsPlugin instance;
 
   private Gson gson;
-
   private CollectorSaveTask collectorSaveTask;
 
+  public static DecimalFormat DF;
+
   public CollectorsPlugin() {
+    DF = new DecimalFormat("#.##");
     this.saveDefaultConfig();
     final File dataFile = new File(this.getDataFolder() + "/data.json");
     if (!dataFile.exists()) {

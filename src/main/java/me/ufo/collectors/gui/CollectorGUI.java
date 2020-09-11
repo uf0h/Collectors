@@ -121,7 +121,7 @@ public class CollectorGUI extends GUI {
 
         if (Econ.depositAmountToPlayer(player, (100 * sellPrice))) {
           this.collector.decrement(collectionType, 100);
-          player.sendMessage(ChatColor.GREEN.toString() + "+$" + (100 * sellPrice) + ChatColor.RED
+          player.sendMessage(ChatColor.GREEN.toString() + "+$" + CollectorsPlugin.DF.format((100 * sellPrice)) + ChatColor.RED
             .toString() + " from selling 100 " + ChatColor.YELLOW.toString() + collectionType
                                .toString() + ChatColor.RED.toString() + ".");
         } else {
