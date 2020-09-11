@@ -41,12 +41,11 @@ public class EntityListener implements Listener {
             collectionType = CollectionType.SPIDER;
           }
 
-          if (collectionType == CollectionType.CREEPER) {
-            collector.increment(collectionType);
-          }
+          collector.increment(collectionType);
         }
       }
-    } catch (final Exception ignored) {
+    } catch (final Exception e) {
+      e.printStackTrace();
     }
   }
 

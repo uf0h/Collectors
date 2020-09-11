@@ -57,11 +57,13 @@ public class CollectorsPlugin extends JavaPlugin {
     if (!Collector.initialize(this)) {
       this.getLogger().warning("Collectors have failed to be loaded into memory.");
       this.getServer().getPluginManager().disablePlugin(this);
+      return;
     }
 
     if (!CollectionType.initialize(this)) {
       this.getLogger().warning("Collector prices have failed to register.");
       this.getServer().getPluginManager().disablePlugin(this);
+      return;
     }
 
     this.getCommand("collectors").setExecutor(new CollectorsCommand());

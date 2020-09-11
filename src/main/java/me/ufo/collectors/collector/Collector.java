@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import com.google.gson.reflect.TypeToken;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Data;
 import lombok.Getter;
 import me.ufo.collectors.CollectorsPlugin;
@@ -23,10 +24,13 @@ import org.bukkit.entity.Player;
 public class Collector {
 
   @Getter
-  public static ConcurrentHashMap<String, Collector> collectorCache = new ConcurrentHashMap<>();
+  public static Object2ObjectOpenHashMap<String, Collector> collectorCache =
+    new Object2ObjectOpenHashMap<>(1000);
+  public final static String SEPERATOR = "::";
 
-  private ConcurrentHashMap<CollectionType, Integer> amounts = new ConcurrentHashMap<>();
-  private Location location;
+  private final Object2IntOpenHashMap<CollectionType> amounts =
+    new Object2IntOpenHashMap<>(CollectionType.cachedValues.length);
+  private final Location location;
 
   private transient CollectorGUI collectorGUI;
   private transient Set<UUID> viewers = new HashSet<>();
@@ -38,7 +42,10 @@ public class Collector {
   }
 
   private void populate() {
-    for (final CollectionType collectionType : CollectionType.values()) {
+    for (final CollectionType collectionType : CollectionType.cachedValues) {
+      if (!collectionType.isEnabled()) {
+        continue;
+      }
       if (collectionType == CollectionType.CAVE_SPIDER) {
         continue;
       }
@@ -47,29 +54,28 @@ public class Collector {
   }
 
   public void increment(final CollectionType collectionType) {
-    this.amounts.put(collectionType, this.amounts.get(collectionType) + 1);
+    this.amounts.addTo(collectionType, 1);
     if (this.collectorGUI != null) {
       this.collectorGUI.update(collectionType);
     }
   }
 
   public void increment(final CollectionType collectionType, final int amount) {
-    this.amounts.put(collectionType, this.amounts.get(collectionType) + amount);
+    this.amounts.computeInt(collectionType, (type, i) -> i += amount);
     if (this.collectorGUI != null) {
       this.collectorGUI.update(collectionType);
     }
   }
 
   public void decrement(final CollectionType collectionType, final int amount) {
-    this.amounts.put(collectionType, (this.amounts.get(collectionType) - amount) < 0 ? 0 :
-                                     this.amounts.get(collectionType) - amount);
+    this.amounts.computeInt(collectionType, (type, i) -> Math.max(i - amount, 0));
     if (this.collectorGUI != null) {
       this.collectorGUI.update(collectionType);
     }
   }
 
   public void drop() {
-    this.amounts.clear();
+    amounts.clear();
     this.viewers.forEach(uuid -> CollectorsPlugin.getInstance().getServer().getPlayer(uuid).closeInventory());
     this.viewers.clear();
 
@@ -89,14 +95,13 @@ public class Collector {
   }
 
   private void deleteInventory() {
-    this.collectorGUI.getInventory().clear();
     this.collectorGUI.setInventory(null);
     this.collectorGUI.setConsumer(null);
     this.collectorGUI = null;
   }
 
   public int getAmountOfCollectionType(final CollectionType collectionType) {
-    return this.amounts.get(collectionType);
+    return this.amounts.getInt(collectionType);
   }
 
   public void disable() {
@@ -119,16 +124,15 @@ public class Collector {
   public static void removeViewer(final UUID uuid) {
     CollectorsPlugin.getInstance().getServer().getScheduler()
       .runTaskAsynchronously(CollectorsPlugin.getInstance(), () -> {
-        for (final Map.Entry<String, Collector> map : collectorCache.entrySet()) {
-          if (map.getValue().getViewers().contains(uuid)) {
-            map.getValue().getViewers().remove(uuid);
-
-            if (map.getValue().getViewers().isEmpty()) {
-              map.getValue().deleteInventory();
+        collectorCache.object2ObjectEntrySet().fastForEach(entry -> {
+          final Collector collector = entry.getValue();
+          if (collector.getViewers().contains(uuid)) {
+            collector.getViewers().remove(uuid);
+            if (collector.getViewers().isEmpty()) {
+              collector.deleteInventory();
             }
-            break;
           }
-        }
+        });
       });
   }
 
@@ -148,16 +152,17 @@ public class Collector {
   }
 
   private static String serialize(final String world, final int chunkX, final int chunkZ) {
-    return world + "::" + chunkX + "::" + chunkZ;
+    return world + SEPERATOR + chunkX + SEPERATOR + chunkZ;
   }
 
   private static String serialize(final Location location) {
-    return location.getWorld().getName() + "::" + location.getChunk().getX() + "::" + location.getChunk()
+    return location.getWorld().getName() + SEPERATOR + location.getChunk().getX() + SEPERATOR + location
+      .getChunk()
       .getZ();
   }
 
   public static boolean initialize(final CollectorsPlugin plugin) {
-    final CompletableFuture<ConcurrentHashMap<String, Collector>> collectors = load();
+    final CompletableFuture<Object2ObjectOpenHashMap<String, Collector>> collectors = load();
 
     try {
       if (collectors.get() != null && !collectors.get().isEmpty()) {
@@ -178,13 +183,16 @@ public class Collector {
     return true;
   }
 
-  private static CompletableFuture<ConcurrentHashMap<String, Collector>> load() {
+  private static CompletableFuture<Object2ObjectOpenHashMap<String, Collector>> load() {
     return CompletableFuture.supplyAsync(() -> {
       try (final FileReader reader = new FileReader(
         CollectorsPlugin.getInstance().getDataFolder().toString() + "/data.json")) {
-        return CollectorsPlugin.getInstance().getGson()
-          .fromJson(reader, new TypeToken<ConcurrentHashMap<String, Collector>>() {
+        final Object2ObjectOpenHashMap<String, Collector> out = new Object2ObjectOpenHashMap<>();
+        final Map<String, Collector> collectorMap =
+          CollectorsPlugin.getInstance().getGson().fromJson(reader, new TypeToken<Map<String, Collector>>() {
           }.getType());
+        collectorMap.forEach(out::put);
+        return out;
       } catch (final IOException e) {
         CollectorsPlugin.getInstance().getLogger().warning("Failed to load collectors.");
         return null;

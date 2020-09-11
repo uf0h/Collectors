@@ -1,5 +1,7 @@
 package me.ufo.collectors.listeners;
 
+import java.util.List;
+import com.google.common.util.concurrent.AtomicDouble;
 import me.ufo.collectors.collector.CollectionType;
 import me.ufo.collectors.collector.Collector;
 import me.ufo.collectors.integration.Econ;
@@ -10,7 +12,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -26,8 +27,6 @@ public class PlayerListener implements Listener {
     ignoreCancelled = true
   )
   public void onBlockPlaceEvent(final BlockPlaceEvent event) {
-    //if (event.isCancelled()) return;
-
     if (event.getBlockPlaced().getType() == Material.BEACON) {
       if (event.getItemInHand() != null) {
         if (CollectorItem.is(event.getItemInHand())) {
@@ -95,7 +94,7 @@ public class PlayerListener implements Listener {
       return;
     }
 
-    if (event.getBlock().getType() == Material.SUGAR_CANE_BLOCK) {
+    /*if (event.getBlock().getType() == Material.SUGAR_CANE_BLOCK) {
       if (!Factions.playerCanPlaceHere(event.getPlayer(), event.getBlock()) ||
           !Worldguard.playerCanPlaceHere(event.getPlayer(), event.getBlock())) {
         event.setCancelled(true);
@@ -117,21 +116,23 @@ public class PlayerListener implements Listener {
 
         collector.increment(CollectionType.SUGAR_CANE, amountOfCane);
       }
-    }
+    }*/
   }
 
   @EventHandler
   public void onEntityExplodeEvent(final EntityExplodeEvent event) {
-    final int size = event.blockList().size();
+    final List<Block> blockList = event.blockList();
+    final int size = blockList.size();
     for (int i = 0; i < size; i++) {
-      if (event.blockList().get(i).getType() != Material.BEACON) {
+      if (blockList.get(i).getType() != Material.BEACON) {
         continue;
       }
 
-      final Location location = event.blockList().get(i).getLocation();
+      final Location location = blockList.get(i).getLocation();
       if (Collector.chunkHasCollector(location)) {
         if (Collector.isCollector(location)) {
           Collector.get(location).drop();
+          break;
         }
       }
     }
@@ -148,24 +149,35 @@ public class PlayerListener implements Listener {
             case LEFT_CLICK_BLOCK:
               if (event.getPlayer().getItemInHand() == null || event.getPlayer().getItemInHand()
                                                                  .getType() == Material.AIR) {
-                final double totalValue = collector.getAmounts().entrySet().stream()
-                  .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
-                  .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
+
+                final AtomicDouble totalValue = new AtomicDouble(0);
+                collector.getAmounts().object2IntEntrySet().fastForEach(entry -> {
+                  if (entry.getKey() != CollectionType.CREEPER && entry.getIntValue() > 0) {
+                    totalValue.addAndGet(entry.getIntValue() * entry.getKey().getSellPrice());
+                  }
+                });
 
                 event.getPlayer().sendMessage(
                   ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN
-                    .toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
+                    .toString() + "$" + totalValue.get() + ChatColor.RED.toString() + ".");
               }
               break;
             case RIGHT_CLICK_BLOCK:
               event.setCancelled(true);
 
               if (event.getPlayer().isSneaking() && event.getPlayer().hasPermission("venom.anaconda")) {
-                final double totalValue = collector.getAmounts().entrySet().stream()
+                /*final double totalValue = collector.getAmounts().entrySet().stream()
                   .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
-                  .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();
+                  .mapToDouble(entry -> (entry.getValue() * entry.getKey().getSellPrice())).sum();*/
 
-                if (totalValue == 0) {
+                final AtomicDouble totalValue = new AtomicDouble(0);
+                collector.getAmounts().object2IntEntrySet().fastForEach(entry -> {
+                  if (entry.getKey() != CollectionType.CREEPER && entry.getIntValue() > 0) {
+                    totalValue.addAndGet(entry.getIntValue() * entry.getKey().getSellPrice());
+                  }
+                });
+
+                if (totalValue.get() == 0) {
                   event.getPlayer().sendMessage(
                     ChatColor.RED.toString() + "This collector has a total value of " + ChatColor.GREEN
                       .toString() + "$" + totalValue + ChatColor.RED.toString() + ".");
@@ -179,12 +191,18 @@ public class PlayerListener implements Listener {
                   outpost.");
                 }*/
 
-                collector.getAmounts().entrySet().stream()
+                /*collector.getAmounts().entrySet().stream()
                   .filter(entry -> entry.getKey() != CollectionType.CREEPER && entry.getValue() > 0)
-                  .forEach(entry -> entry.setValue(0));
+                  .forEach(entry -> entry.setValue(0));*/
 
-                if (Econ.depositAmountToPlayer(event.getPlayer(), totalValue)) {
-                  event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "+$" + totalValue + ChatColor.RED
+                collector.getAmounts().object2IntEntrySet().fastForEach(entry -> {
+                  if (entry.getKey() != CollectionType.CREEPER) {
+                    entry.setValue(0);
+                  }
+                });
+
+                if (Econ.depositAmountToPlayer(event.getPlayer(), totalValue.get())) {
+                  event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "+$" + totalValue.get() + ChatColor.RED
                     .toString() + " from selling everything in this collector.");
                 }
 

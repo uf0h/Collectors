@@ -3,6 +3,7 @@ package me.ufo.collectors.collector;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import lombok.Setter;
 import me.ufo.collectors.CollectorsPlugin;
 import me.ufo.collectors.util.NBTItem;
 import me.ufo.collectors.util.Style;
@@ -46,6 +47,10 @@ public enum CollectionType {
   @Getter
   private int slot;
 
+  @Getter
+  @Setter
+  private boolean enabled;
+
   CollectionType(final Material material) {
     this.material = material;
   }
@@ -72,7 +77,7 @@ public enum CollectionType {
     final int size = this.lore.size();
     final List<String> out = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      out.set(i, StringUtils.replaceOnce(
+      out.add(StringUtils.replaceOnce(
         this.lore.get(i),
         "%amount%",
         "" + collector.getAmountOfCollectionType(this)));
@@ -97,8 +102,9 @@ public enum CollectionType {
           }
           collectionType.lore = Style.translate(plugin.getConfig().getStringList(PATH + "lore"));
           collectionType.slot = plugin.getConfig().getInt(PATH + "gui-slot");
+          collectionType.enabled = true;
         } else {
-          return false;
+          collectionType.enabled = false;
         }
       }
     } catch (final Exception e) {
