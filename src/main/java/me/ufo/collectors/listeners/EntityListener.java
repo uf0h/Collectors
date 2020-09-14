@@ -26,6 +26,10 @@ public class EntityListener implements Listener {
     }
 
     final List<ItemStack> drops = event.getDrops();
+    if (drops.isEmpty()) {
+      return;
+    }
+
     final ItemStack drop = drops.get(0);
     if (drop == null) {
       return;
